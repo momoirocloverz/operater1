@@ -79,7 +79,6 @@
             }
         },
         created(){
-            this.activeName = this.$route.query.type;
             this.getDetail()
         },
         mounted() {
@@ -102,7 +101,13 @@
                 }
                 this.restTabArr = empty;
                 if( this.restTabArr.length ){
-                    this.activeName = this.restTabArr[0].name;
+//                    this.activeName = this.restTabArr[0].name;
+                    let find = this.restTabArr.find(ele=>{
+                        return ele.name == this.$route.query.type;
+                    })
+                    if( find ){
+                        this.activeName = this.$route.query.type;
+                    }
                 }
             },
             handleClick(tab, event) {

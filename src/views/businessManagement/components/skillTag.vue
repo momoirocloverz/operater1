@@ -19,7 +19,7 @@
                           key="111">
                     <el-table-column prop="dicName" :formatter="forOne" label="一级分类"></el-table-column>
                     <el-table-column prop="dicName" :formatter="forTwo" label="二级分类"></el-table-column>
-                    <el-table-column prop="shortName" label="排序"></el-table-column>
+                    <el-table-column prop="orderBy" label="排序"></el-table-column>
                     <el-table-column prop="status" :formatter="statusFor" label="显示状态">
                     </el-table-column>
                     <el-table-column label="操作" v-if="AuthBoolean('69')">

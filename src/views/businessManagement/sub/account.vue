@@ -71,16 +71,6 @@
         <el-dialog title="修改角色" class="setRoot2Scoped setMiddleDialog" :visible.sync="editVisible" width="450px"  :close-on-click-modal="false" center>
             <el-form :model="editForm" status-icon :rules="editRules" ref="editForm"
                          label-width="120px" class="demo-ruleForm " >
-                
-                <el-form-item label="真实姓名：" >
-                    <div>{{editForm.name}}</div>
-                </el-form-item>
-                
-                <el-form-item label="手机号码：" prop="mobile">
-                    <el-input v-model.trim="editForm.mobile"  size="small" placeholder="手机号码"
-                              clearable maxlength='11'></el-input>
-                </el-form-item>
-                
                 <el-form-item label="角色：" prop="role">
                     <el-select size="small" class="setWidth" v-model="editForm.role" placeholder="角色">
                         <el-option v-for="item in rolesOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -156,16 +146,11 @@
                 editForm:{
                     role:'',
                     name:'',
-                    mobile:'',
                 },
                 editRules:{
                     role:[
                         { required: true, message: '角色不能为空', trigger: 'change' },
-                    ],
-                    mobile:[
-                        { required: true, message: '手机号码不能为空', trigger: 'blur' },
-                        { validator: validateMobile, trigger: 'blur' },
-                    ],
+                    ]
                 },
                 rowBridge:{},
             }
@@ -229,12 +214,10 @@
                         console.log('submit!');                        
                         let data ={
                             userId:this.rowBridge.userId,
-                            customerId:this.$route.query.id,
-                            roleId:this.editForm.role,
-                            mobile:this.editForm.mobile,
+                            roleIdList:[this.editForm.role],
                         }; 
                         this.editAble = true;
-                        this.ApiLists.updateCusRoleUser(data).then(res=>{
+                        this.ApiLists.roleAssignRole(data).then(res=>{
                             let { respCode,data } = res;
                             if( respCode == 0 ){
                                 this.$message({
@@ -330,15 +313,18 @@
             },
             addAction(){
                 this.addVisible = true;
+                this.$nextTick(()=>{
+                    this.$refs['addForm'].resetFields();
+                })
             },
             editAction(row){
                 this.rowBridge = row;
-                this.editForm.role = +this.rowBridge.roleIds;
-                this.editForm.name = this.rowBridge.realName;
-                this.editForm.mobile = this.rowBridge.mobile;
                 this.editVisible = true;
                 this.$nextTick(()=>{
                     this.$refs['editForm'].resetFields();
+                    this.editForm.role = +row.roleIds;
+                    this.editForm.name = row.realName;
+                    this.editForm.mobile = row.mobile;
                 });
             },
             deleteAction(row){
@@ -404,7 +390,7 @@
             height: 330px;
         }
         .setRoot2Scoped .el-dialog {
-            height: 320px;
+            height: 210px;
         }
         .setRoot3Scoped .el-dialog {
             height: 210px;

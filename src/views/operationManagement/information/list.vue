@@ -91,7 +91,7 @@
                 <div class="wang-editor" v-html="editorContent" style="height:500px;overflow-y: auto"></div>
             </el-dialog>
             <div slot="footer" class="dialog-footer pb20 flex-box flex-right align-item-center" style="">
-                <div class="pr30" v-show="params.editType === 1"><el-checkbox v-model="inforForm.checked">直接上传</el-checkbox></div>
+                <div class="pr30" v-show="params.editType === 1"><el-checkbox v-model="inforForm.checked">直接上架</el-checkbox></div>
                 <div class="pr20 ml20">
                     <el-button class="wh-1" @click="preEditor()">预 览</el-button>
                     <el-button class="wh-1" type="primary" @click="submitDanger()">{{params.btnText}}</el-button>
@@ -121,7 +121,20 @@
                     } else {
                         callback(new Error('请输入0-1000整数'));
                     }
-                },500);
+                },300);
+            };
+            let validateText = (rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('资讯标题不能为空'));
+                }
+                setTimeout(() => {
+                    if (value.length < 5) {
+                        let num = 5 - value.length;
+                        callback(new Error(`还需输入${num}个字`));
+                    } else {
+                        callback();
+                    }
+                },300);
             };
             return {
                 options2: [{name:'不限',value:-1},{name:'待上架',value:1},{name:'已下架',value:2},{name:'已上架',value:3}],
@@ -150,7 +163,10 @@
                 loading: false,
                 rules:{
                     content:[{required: true, message: '资讯内容不能为空', trigger: 'blur' }],
-                    title:[{required: true, message: '资讯标题不能为空', trigger: 'blur' },{required: true,min:5,max:30,message:'请输入5~30个中文字符以内',trigger: 'blur'}],
+                    title:[{required: true, message: '资讯标题不能为空', trigger: 'blur' },
+                        {validator: validateText, trigger: 'blur' }
+                        // {required: true,min:5,max:30,message:'请输入5~30个中文字符以内',trigger: 'blur'}
+                        ],
                     source:[{required: true, message: '资讯来源不能为空', trigger: 'blur' },{required: true,max:10,message:'请输入10个中文字符以内',trigger: 'blur'}],
                     weights:[{required: true, message: '权重不能为空', trigger: 'blur' },{validator: validateWeight, trigger: 'blur' }],
                     showPic:[{required: true, message: '上传图片不能为空', trigger: 'change' }],

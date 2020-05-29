@@ -153,7 +153,7 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         console.log('submit!');
-                        if( (!this.editor.txt.text())||(!this.editorContent) ){
+                        if( !this.editorContent ){
                             this.$message({
                                 message: '内容不能为空',
                                 type: 'error'

@@ -26,7 +26,6 @@ export default {
         }
     },
     mounted(){
-        this.getQuery();
         this.analyseAuth();
     },
     methods:{
@@ -52,6 +51,7 @@ export default {
             this.restTabArr = empty;
             if( this.restTabArr.length ){
                 this.activeName = this.restTabArr[0].name;
+                this.getQuery();
             }
         },
         handleClick(tab, event) {

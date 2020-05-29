@@ -102,7 +102,7 @@
                             <el-radio :label="6">不启用</el-radio>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item label="是否向员工收费" v-show="commissionForm.radio1 == 3">
+                    <el-form-item label="是否向人员收费" v-show="commissionForm.radio1 == 3">
                         <el-radio-group v-model.trim="commissionForm.radio2" >
                             <el-radio :label="3">是</el-radio>
                             <el-radio :label="6">否</el-radio>
@@ -114,7 +114,7 @@
                                       placeholder="请输入" clearable ></el-input>
                             <div>元/次</div>
                         </div>
-                        <div>零工每天首次打卡收费</div>
+                        <div>零工收入发放时，单个零工发放的手续费</div>
                     </el-form-item>
                         </div>
                     <div class="flexHere">
@@ -139,7 +139,7 @@
                                 <el-radio :label="6">不启用</el-radio>
                             </el-radio-group>
                         </el-form-item>
-                        <el-form-item label="是否向员工收费" v-show="insuranceForm.radio1 == 3">
+                        <el-form-item label="是否向人员收费" v-show="insuranceForm.radio1 == 3">
                             <el-radio-group v-model.trim="insuranceForm.radio2">
                                 <el-radio :label="3">是</el-radio>
                                 <el-radio :label="6">否</el-radio>
@@ -234,7 +234,7 @@
         data() {
             var validatePlatPrice = (rule, value, callback) => {
                 if( this.insuranceForm.radio1 == 3 ){
-                    if( value ){
+                    if( (value == 0) || value ){
                         if( isNaN( +value ) ){
                             callback(new Error('请输入正确的金额数值'));
                         }else{
@@ -270,11 +270,11 @@
                 }
                 if( this.dynamicAmoArray[index].able == 3 ){
                     if( isNaN(this.dynamicAmoArray[index].dynamicAmount) ){
-                        callback(new Error('填写单价需大于0'));
+                        callback(new Error('保险单价不能为空'));
                     }else{
                         if( this.dynamicAmoArray[index].multipleSelection.length ){
                             if( isNaN(this.dynamicAmoArray[index].dynamicAmount) ){
-                                callback(new Error('填写单价需大于0'));
+                                callback(new Error('保险单价不能为空'));
                             }else{
                                 callback();
                             }
@@ -286,7 +286,7 @@
             };
             var validateComPrice = (rule, value, callback) => {
                 if( this.commissionForm.radio1 == 3 ){
-                    if( value ){
+                    if( (value == 0) || value){
                         if( isNaN( +value ) ){
                             callback(new Error('请输入正确的单价'));
                         }else{
@@ -341,7 +341,7 @@
                 insuranceVisible: false,  
                 insuranceForm: {
                     radio1: 3,
-                    radio2: 3, 
+                    radio2: 6, 
                     price:'',
                     regular:6,
                     labor:6,
@@ -457,7 +457,7 @@
                                 attributeId:ele.id,
                                 tableDataDialog:[],
                                 multipleSelection:[],
-                                able:6,
+                                able:(ele.attributeName == '正式工')||(ele.attributeName == '零工')? 6:3 ,
                                 currentPage:1,
                             }
                         })
@@ -482,7 +482,7 @@
                     if( respCode === 0 ){
                         if( data&&data.list ){
                             data.list.forEach(ele=>{
-                                ele.amount = 0;  
+                                ele.amount = 1;  
                             });
                             let deep1 = JSON.parse( JSON.stringify(data.list) );
                             this.dynamicAmoArray[index].tableDataDialog = JSON.parse( JSON.stringify(data.list) );
@@ -741,7 +741,7 @@
                             if( respCode === 0 ){
                                 if( data&&data.list ){
                                     data.list.forEach(ele=>{
-                                        ele.amount = 0;  
+                                        ele.amount = 1;  
                                     });
                                     let deep1 = JSON.parse( JSON.stringify(data.list) );
                                     this.dynamicAmoArray.forEach((ele,index)=>{
