@@ -5,7 +5,7 @@
                 <div>
                     <el-input v-model="form.talentName" class="lockWidth" size="small" placeholder="被保人"
                               clearable></el-input>
-                    <el-input v-model="form.customerName" class="lockWidth" size="small" placeholder="投放方"
+                    <el-input v-model="form.customerName" class="lockWidth" size="small" placeholder="投保方"
                               clearable></el-input>
                     <el-input v-model="form.mobile" class="lockWidth" size="small" placeholder="联系电话"
                               clearable></el-input>
@@ -54,10 +54,11 @@
             </div>
             <div class="tableCon">
                 <el-table :data="tableData" stripe style="width: 100%">
-                    <el-table-column prop="createdAt" label="投保时间" width="150"></el-table-column>
+                    <el-table-column prop="createdAt" label="投保时间" width="170"></el-table-column>
                     <el-table-column prop="talentName" label="被保人" width="100"></el-table-column>
-                    <el-table-column prop="mobile" label="联系电话" width="150" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="customerName" label="投保方" width="120" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="mobile" label="联系电话" width="120" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="customerName" label="投保方" width="100" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="insuCompany" label="投保公司" width="100" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="insuName" label="保险名称" width="100" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="policyNo" label="保单号" width="" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="" label="保障时间" width="200" show-overflow-tooltip>
@@ -200,7 +201,7 @@
                 this.ApiLists.getInsuDetail(params).then(res => {
                     if (res.respCode === 0) {
                         this.tableData = res.data.list ? res.data.list : []
-                        this.pageTotal = res.data.size ? res.data.size : 0
+                        this.pageTotal = res.data.total ? res.data.total : 0
                     }
                 }).catch(err => {
                     console.log(err)

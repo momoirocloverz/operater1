@@ -4,7 +4,7 @@
             <div class="topFirst">
                 <div>
                     <el-input v-model="input1" class="lockWidth" size="small" placeholder="被保人" clearable></el-input>
-                    <el-input v-model="input2" class="lockWidth" size="small" placeholder="投放方" clearable></el-input>
+                    <el-input v-model="input2" class="lockWidth" size="small" placeholder="投保方" clearable></el-input>
                     <el-input v-model="input2" class="lockWidth" size="small" placeholder="联系电话" clearable></el-input>
                     <el-input v-model="input2" class="lockWidth" size="small" placeholder="保单号" clearable></el-input>
                     <el-date-picker class="mr15" v-model="dateRange" type="daterange" align="right" unlink-panels

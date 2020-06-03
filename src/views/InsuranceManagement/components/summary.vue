@@ -194,10 +194,11 @@
                 };
                 this.ApiLists.getSelfInsuList(params).then(res =>{
                     if(res.respCode === 0){
-                        res.data.list ? this.tableData = res.data.list : res.data.list = []
-                        this.pageTotal = res.data.total
+                        this.tableData = res.data.list || []
+                        this.pageTotal = res.data.total || 0
                     }
                 }).catch(err => {
+                  
                     console.log(err)
                 }).finally(()=>{
                     this.loading = false;

@@ -1,5 +1,5 @@
 <template>
-    <div class="skill-tag" v-loading="loading" element-loading-text="正在请求中...">
+    <div class="skill-tag" v-loading="loading">
         <div class="pt20">
             <div class="flex-box flex-left">
                 <el-select size="small" class="lockWidth" v-model="value"
@@ -10,12 +10,7 @@
                 </el-select>
             </div>
             <div class="tableCon">
-                <el-table :data="tableData"
-                          style="width: 100%; margin-top: 20px"
-                          row-key="id"
-                          border
-                          default-expand-all
-                          :tree-props="{children: 'sonNode', hasChildren: 'hasChildren'}"
+                <el-table :data="tableData" style="width: 100%; margin-top: 20px" row-key="id" border  default-expand-all  :tree-props="{children: 'sonNode', hasChildren: 'hasChildren'}"
                           key="111">
                     <el-table-column prop="dicName" :formatter="forOne" label="一级分类"></el-table-column>
                     <el-table-column prop="dicName" :formatter="forTwo" label="二级分类"></el-table-column>
@@ -117,9 +112,13 @@
                             let result = this.tableData;
                             result.forEach((item,index) => {
                                 let arr = item.sonNode.filter(i => i.status === val);
-                                this.tableData[index].sonNode = arr
+                                this.tableData[index].sonNode = arr;
                             })
                         }
+                        let final = this.tableData.filter(ele=>{
+                            return ele.sonNode && ele.sonNode.length
+                        });
+                        this.tableData = final;
                     }
                 }).catch(err => {
                     console.log(err)

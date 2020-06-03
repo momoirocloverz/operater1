@@ -2,9 +2,9 @@
   <div class="role-permission bg-fff">
     <div class="flex-box flex-center">
       <div>
-        <el-tree :data="data" default-expand-all show-checkbox check-on-click-node node-key="permCode" @check="clickDeal" :check-strictly="true" ref="tree" highlight-current :props="defaultProps">
+        <el-tree :data="data" default-expand-all show-checkbox check-on-click-node node-key="permCode" :check-strictly="checkShow" ref="tree" highlight-current :props="defaultProps">
         </el-tree>
-        <!---->
+        <!--@check="clickDeal"-->
         <div class="buttons tc pt20 pb20">
           <el-button type="primary" class="el-input-width" @click="saveCheck">保存</el-button>
         </div>
@@ -25,25 +25,34 @@ export default {
     return {
       data: [],
       permCodeList: [],
+      checkShow:false,
       defaultProps: {
         children: 'sonList',
         label: 'name'
       }
     }
   },
-  async mounted() {
-    await this.getTree();
-    await this.getDetail()
+  created(){
+    this.getTree();
+  },
+   mounted() {
+     this.getDetail()
   },
   methods: {
     getDetail() {
+      let _this = this;
       this.ApiLists.roleDetail({ roleId: this.$route.query.id }).then(res => {
         if (res.respCode === 0) {
           let result = res.data.rolePermissionList || [];
           this.permCodeList = [...result.map(i => i.permCode)];
           // this.$refs.tree.setCheckedNodes(this.permCodeList);
           console.log(this.permCodeList)
+          _this.checkShow = true;
           this.$refs.tree.setCheckedKeys(this.permCodeList);
+          setTimeout(()=>{
+            _this.checkShow = false;
+            console.log(this.checkShow)
+          },200)
         }
       }).catch(err => {
 
@@ -95,9 +104,10 @@ export default {
       }
     },
     saveCheck() {
+      // let list = this.$refs.tree.getCheckedNodes()
       let list = this.$refs.tree.getCheckedNodes()
-      // let permCodeList = this.$refs.tree.getCheckedKeys()
-      // let parentCodeList = this.$refs.tree.getHalfCheckedKeys()
+      let parentList = this.$refs.tree.getHalfCheckedNodes()
+      list = [...list,...parentList];
       if (list.length === 0) {
         return this.$message.error('请为该角色设置权限');
       }

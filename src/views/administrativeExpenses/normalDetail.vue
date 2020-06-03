@@ -37,10 +37,8 @@
                     <el-button type="info" size="small" icon="el-icon-search" @click="searchAction">搜 索</el-button>
                 </div>
             </div>
-            
-            
             <div class="summaryText">
-                <div>合计：支出-平台使用费{{sum1}}元，保险费{{sum2}}元，付款手续费{{sum3}}元；收入-充值{{sum4}}元</div>
+                <div>合计：支出-平台信息费{{sum1}}元，系统使用费{{sum2}}元，付款手续费{{sum3}}元；收入-充值{{sum4}}元</div>
             </div>
             <div class="tableCon">
                 <el-table :data="tableData" max-height="530" stripe style="width: 100%;margin-top:20px"  empty-text="暂无相关交易明细" v-loading="loading">
@@ -50,11 +48,10 @@
                             {{ typeMap[scope.row.category] }}
                         </template>
                     </el-table-column>
-<!--                    <el-table-column prop="inOutType" label="交易对象"></el-table-column>-->
-                    <el-table-column prop="inOutType" label="收入"></el-table-column>
-                    <el-table-column prop="amount" label="支出" show-overflow-tooltip></el-table-column>
+                    <el-table-column label="收入" :formatter="formatterIncome"></el-table-column>
+                    <el-table-column label="支出" :formatter="formatterOut" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="afterBalance" label="期末余额" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="note" label="备注" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="note"  :formatter="formatterNoteInfo" label="备注" show-overflow-tooltip></el-table-column>
                 </el-table>
             </div>
             <div class="pagCon" v-if="total">
@@ -82,7 +79,7 @@
                     <el-form-item label="支付密码" prop="password">
                         <div class="inputInnerFlex">
                             <el-input class="inputInnerSelf" maxlength="6" v-model.trim="chargeForm.password" size="small"
-                                      placeholder="请输入" clearable></el-input>
+                                      placeholder="请输入" clearable show-password></el-input>
                         </div>
                     </el-form-item>
                     <el-form-item>
@@ -133,13 +130,13 @@
                     <el-form-item label="支付密码" prop="pass">
                         <div class="inputInnerFlex">
                             <el-input class="inputInnerSelf" maxlength="6" v-model.trim="resetForm.pass" size="small"
-                                      placeholder="请输入" clearable></el-input>
+                                      placeholder="请输入" clearable show-password></el-input>
                         </div>
                     </el-form-item>
                     <el-form-item label="重复支付密码" prop="repeatPass">
                         <div class="inputInnerFlex">
                             <el-input class="inputInnerSelf" maxlength="6" v-model.trim="resetForm.repeatPass" size="small"
-                                      placeholder="请输入" clearable></el-input>
+                                      placeholder="请输入" clearable show-password></el-input>
                         </div>
                     </el-form-item>
                     <div class="flexHere">
@@ -163,7 +160,7 @@
                 if( isNaN( +value ) ){
                     callback(new Error('请输入正确的充值金额'));
                 }else{                    
-                    if( Number.isInteger(+value) ){
+                    if( Number.isInteger(+value)&&(+value != 0) ){
                         this.chargeForm.amount = +value;
                         callback();
                     }else{
@@ -175,11 +172,11 @@
                 let reg = /[^0-9a-zA-Z]/gi;
                 let length = value.length;
                 let illegal = reg.test(value);
-                if( (length<6)||(length>18) ){
-                    callback(new Error('请输入6-18位字母或数字'));
+                if( (length != 6) ){
+                    callback(new Error('请输入6位密码'));
                 }else{
                     if( illegal ){
-                        callback(new Error('请输入6-18位字母或数字'));
+                        callback(new Error('请输入6位密码'));
                     }else{
                         callback();
                     }
@@ -271,14 +268,14 @@
                 options1: [
                     {label: '不限', value: 0},
                     {label: '付款手续费', value: 2},
-                    {label: '系统使用费', value: 1},
+                    {label: '系统使用费', value: 1},                    
+                    {label: '平台信息费', value: 3},
                     {label: '充值', value: 4},
-                    {label: '信息服务费', value: 3},
                 ],
                 typeMap:{
                     2:'付款手续费',
                     1:'系统使用费',
-                    3:'信息服务费',
+                    3:'平台信息费',
                     4:'充值',
                 },
                 tableData: [],
@@ -315,10 +312,49 @@
         mounted() {
             this.analyseQuery();
             let data = this.geneParams();
+            data.pageNum = 1;
+            data.pageSize = 20;
             this.getRecordList(data);
             this.getFinancialPhone();
         },
         methods: {
+            formatterNoteInfo(row,column){
+                if( row.category ){
+                    if(  row.category == 4  ){
+                        return row.note;
+                    }else{
+                       return row.note + this.Dayjs(row.feeDate).format('-MM-DD');
+                    }
+                }else{
+                    return '-';
+                }
+            },
+            formatterIncome(row,column){
+                switch( row.inOutType ){
+                    case 1:
+                        return '-';
+                        break;
+                    case 2:
+                        return row.amount;
+                        break;    
+                    default:
+                        return '-';
+                        break;    
+                }
+            },
+            formatterOut(row,column){
+                switch( row.inOutType ){
+                    case 1:
+                        return row.amount;
+                        break;
+                    case 2:
+                        return '-';
+                        break;    
+                    default:
+                        return '-';
+                        break;
+                }
+            },
             getFinancialPhone(){
                 let params = {
                     paramName:'wancai_finance_staff_mobile'
@@ -352,9 +388,9 @@
                 this.ApiLists.getCusAcListTotal(data).then(res=>{
                     let { respCode,data } = res;
                     if( respCode == 0 ){                        
-                        this.sum1 = data&&data[1] || 0;
-                        this.sum2 = data&&data[2] || 0;
-                        this.sum3 = data&&data[3] || 0;
+                        this.sum1 = data&&data[3] || 0;
+                        this.sum2 = data&&data[1] || 0;
+                        this.sum3 = data&&data[2] || 0;
                         this.sum4 = data&&data[4] || 0;
                     }
                 }).catch(err=>{
@@ -475,6 +511,9 @@
                                 this.chargeVisible = false;
                                 this.analyseQuery();
                                 let data = this.geneParams();
+                                this.currentPage1 = 1;
+                                data.pageNum = 1;
+                                data.pageSize = 20;
                                 this.getRecordList(data);
                                 this.getFinancialPhone();
                             }
@@ -553,6 +592,8 @@
             searchAction(){
                 this.currentPage1 = 1;
                 let data = this.geneParams();
+                data.pageNum = 1;
+                data.pageSize = 20;
                 this.getRecordList(data);
             },
         }

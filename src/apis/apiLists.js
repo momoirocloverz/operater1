@@ -661,6 +661,13 @@ const _apiLists = {
             params,
         })
     },
+    updateBestFrame: (params) => {
+        return instance({
+            method: 'get',
+            url: '/user-center/talent/updateBestFrame',
+            params,
+        })
+    },
     //用户管理
     listTalent: (data) => {
         return instance({
