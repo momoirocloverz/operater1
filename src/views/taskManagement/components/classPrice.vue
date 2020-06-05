@@ -2,7 +2,7 @@
     <div class="class-price">
         <div style="margin-top: 40px">
             <el-table :data="tableData"  :span-method="objectSpanMethod"  border  style="width: 100%; margin-top: 20px">
-                <el-table-column  prop=""  label="工种">
+                <el-table-column  prop=""  label="技能标签">
                     <template v-slot="scope">
                         <div>{{scope.row.industryName}} <span>{{$dictionary.needConfirm[scope.row.status]}}</span></div>
                     </template>

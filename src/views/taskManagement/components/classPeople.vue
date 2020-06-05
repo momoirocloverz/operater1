@@ -3,7 +3,7 @@
         <div class="topCon">
             <div class="topFirst">
                 <div>
-                    <el-input v-model="form.schedulingId" class="lockWidth" size="small" placeholder="排班id"
+                    <el-input v-model="form.talentName" class="lockWidth" size="small" placeholder="人员姓名"
                               clearable></el-input>
                     <el-button type="info" size="small" icon="el-icon-search" @click="search()">搜 索</el-button>
                 </div>
@@ -109,7 +109,7 @@
                 this.loading = true;
                 this.ApiLists.pageList({
                     schedulingId: this.$route.query.schedulingId,
-                    talentId: this.form.talentId,
+                    talentName: this.form.talentName === -1 ? '' : this.form.talentName,
                     talentType: this.form.talentType,
                     settlementType: this.form.settlementType === -1 ? '' : this.form.settlementType,
                     industry: this.form.industry === -1 ? '' : this.form.industry,

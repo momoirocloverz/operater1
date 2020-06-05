@@ -3,10 +3,10 @@
         <div class="bottomCon">
             <div class="tableCon">
                 <el-table :data="tableData" stripe style="width: 100%">
-                    <el-table-column prop="createdAt" label="时间" width=""></el-table-column>
-                    <el-table-column prop="content" label="操作内容"  show-overflow-tooltip width=""></el-table-column>
-                    <el-table-column prop="id" label="ID" width="" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="optName" label="操作人" width=""></el-table-column>
+                    <el-table-column prop="createdAt" label="时间" align="center"></el-table-column>
+                    <el-table-column prop="content" label="操作内容"  show-overflow-tooltip align="center"></el-table-column>
+                    <el-table-column prop="optId" label="操作人ID"  align="center" width="" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="optName" label="操作人" align="center"></el-table-column>
                 </el-table>
             </div>
             <div class="pagCon">

@@ -77,7 +77,7 @@
                 },
                 options: [
                     {label: '不限', value: -1},
-                    {label: '自由任务', value: 1},
+                    {label: '自有任务', value: 1},
                     {label: '指派任务', value: 2},
                 ],
                 options2: [

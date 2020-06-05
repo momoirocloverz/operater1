@@ -67,6 +67,7 @@ export default {
     }
   },
   mounted() {
+      localStorage.removeItem('tempStoreQuery')
     this.getList()
   },
   methods: {
@@ -126,6 +127,10 @@ export default {
         path: '/main/businessList/permissionConfiguration',
         query: row,
       })
+      localStorage.setItem('tempStoreQuery',JSON.stringify({
+          path:this.$route.path,
+          query:this.$route.query
+       }));
       window.open(href);
     },
     submitPass(formName) {

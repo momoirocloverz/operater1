@@ -5,7 +5,7 @@
                 <el-table :data="tableData" height="530" stripe style="width: 100%">
                     <el-table-column prop="talentName" label="姓名" width=""></el-table-column>
                     <el-table-column prop="sex" :formatter="$sexFor" label="性别" width=""></el-table-column>
-                    <el-table-column prop="industryName" label="工种"></el-table-column>
+                    <el-table-column prop="industryName" label="技能标签"></el-table-column>
                     <el-table-column prop="workStartTime" :formatter="$isContent" label="开始打卡时间" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="workEndTime" :formatter="$isContent" label="结束打卡时间" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="workHours" :formatter="$isContent" label="工时" show-overflow-tooltip></el-table-column>

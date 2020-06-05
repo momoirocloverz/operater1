@@ -77,7 +77,7 @@
                     {label: '待执行', value: 1},
                     {label: '待结算', value: 2},
                     {label: '已完成', value: 3},
-                    {label: '已结束', value: 4},
+                    {label: '已关闭', value: 4},
                 ],
                 currentPage: 1,
                 pageSize: 20,

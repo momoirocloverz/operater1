@@ -107,8 +107,7 @@
                     </el-dialog>
                     <div class="flexHere pt30 pb20">
                         <el-button type="primary" size="small" class="sameWidthBtn"
-                                   @click="submitNewFormPass('newForm')">创 建
-                        </el-button>
+                                   @click="submitNewFormPass('newForm')">保 存</el-button>
                         <el-button type="info" size="small" class="sameWidthBtn" @click="cancelNewFormPass('newForm')">取
                             消
                         </el-button>

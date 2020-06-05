@@ -52,7 +52,6 @@ instance.interceptors.response.use(function (response) {
       return MessageBox.alert(response.data.errorMsg, '', {
         confirmButtonText: '确定',
         callback: action => {
-
         }
       });
     } else {

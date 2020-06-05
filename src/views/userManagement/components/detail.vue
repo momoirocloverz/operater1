@@ -174,15 +174,29 @@
                         });
                     });
                 }else {
-                    this.freezeAccount(1)
+                  this.$confirm('确定要解冻该账户吗?', '提示', {
+                      confirmButtonText: '确定',
+                      cancelButtonText: '取消',
+                      cancelButtonClass:'el-button--info',
+                      closeOnClickModal:false,
+                      type: 'warning'
+                  }).then(() => {
+                      this.freezeAccount(1)
+                  }).catch(() => {
+                      this.$message({
+                          type: 'info',
+                          message: '已取消解冻'
+                      });
+                  });
                 }
             },
             resetPwdFunc(){
                 if(this.info.status === 2){
                     return this.$message.error('您的账号已冻结，如有问题，请联系客服咨询!')
                 }
-                if(this.request){return}
-                this.request = true
+                // 防抖
+                // if(this.request){return}
+                // this.request = true
                 this.$confirm('确定要重置该用户密码吗?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -199,11 +213,12 @@
                                 message: '重置密码成功，密码为初始密码!'
                             });
                         }
-                    }).finally(() =>{
-                        setTimeout(() => {
-                            this.request = false
-                        },500)
                     })
+                    // .finally(() =>{
+                    //     setTimeout(() => {
+                    //         this.request = false
+                    //     },100)
+                    // })
                 }).catch(() => {
                     this.$message({
                         type: 'info',
@@ -247,8 +262,8 @@
                         this.info = res.data.list[0];
                         this.imageUrl1 = this.info.bestFrame;
                         this.tableData1 = [
-                            {title: '账号', value: this.info.userId},
-                            {title: '账号类型', value:this.statusFor(this.info.status),btnText:this.status(this.info.status), highLight:false,
+                            {title: '账号', value: this.info.mobile},
+                            {title: '账号状态', value:this.statusFor(this.info.status),btnText:this.status(this.info.status), highLight:false,
                              btnShow:this.AuthBoolean('621')
                             }];
                         this.tableData2 = [

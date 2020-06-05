@@ -120,9 +120,13 @@ export default {
       }).then(res => {
         if (res.respCode === 0) {
           this.$message.success('权限设置成功!')
-          this.$router.go(-1)
+          sessionStorage.setItem('cropSwitchItem','third');
+          let obj = JSON.parse(localStorage.getItem('tempStoreQuery') );
+          this.$router.push({
+              path:obj.path,
+              query:obj.query
+          })
         }
-        console.log(res)
       }).catch(err => {
         console.log(err)
       })

@@ -315,7 +315,7 @@
                 let params = {
                     id:this.deleteId
                 };
-                this.ApiLists.delRole(params).then(res => {
+                this.ApiLists.skipIntecepeDelRole(params).then(res => {
                     let { data,respCode } = res;
                     if( respCode === 0 ){
                         this.$message({
@@ -325,6 +325,11 @@
                         this.dynamicPage = 1;
                         this.fetchRoleList();
                         this.deleteVisible = false;
+                    }else{
+                        this.$message({
+                            message: data.errorMsg,
+                            type: 'error'
+                        });   
                     }
                 }).catch(err=>{
                     console.log('err',err);

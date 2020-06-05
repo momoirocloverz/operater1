@@ -9,16 +9,32 @@
             <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.name}}</div>
           </el-col>
           <el-col :span="5">
-            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.busNum}}</div>
+            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.busNum}}
+              <i class="el-icon-top" style="color:red" v-if="index==1 && data[1].busNum - data[2].busNum > 0"></i>
+              <i class="el-icon-bottom" style="color:#999" v-else-if="index==1 && data[1].busNum - data[2].busNum < 0"></i>
+              <span v-else></span>             
+            </div>
           </el-col>
           <el-col :span="5">
-            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personalBus}}</div>
+            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personalBus}}
+              <i class="el-icon-top" style="color:red" v-if="index==1 && data[1].personalBus - data[2].personalBus > 0"></i>
+              <i class="el-icon-bottom" style="color:#999" v-else-if="index==1 && data[1].personalBus - data[2].personalBus < 0"></i>
+              <span v-else></span>              
+            </div>
           </el-col>
           <el-col :span="5">
-            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personal}}</div>
+            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personal}}
+              <i class="el-icon-top" style="color:red" v-if="index==1 && data[1].personal - data[2].personal > 0"></i>
+              <i class="el-icon-bottom" style="color:#999" v-else-if="index==1 && data[1].personal - data[2].personal < 0"></i>
+              <span v-else></span>
+            </div>
           </el-col>
           <el-col :span="5">
-            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personalReal}}</div>
+            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personalReal}}
+              <i class="el-icon-top" style="color:red" v-if="index==1 && data[1].personalReal - data[2].personalReal > 0"></i>
+              <i class="el-icon-bottom" style="color:#999" v-else-if="index==1 && data[1].personalReal - data[2].personalReal < 0"></i>
+              <span v-else></span>              
+            </div>
           </el-col>
         </el-row>
       </div>
@@ -29,13 +45,25 @@
             <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.name}}</div>
           </el-col>
           <el-col :span="5">
-            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.busNum}}</div>
+            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.busNum}}
+              <i class="el-icon-top" style="color:red" v-if="index==1 && data2[1].busNum - data2[2].busNum > 0"></i>
+              <i class="el-icon-bottom" style="color:#999" v-else-if="index==1 && data2[1].busNum - data2[2].busNum < 0"></i>
+              <span v-else></span>              
+            </div>
           </el-col>
           <el-col :span="5">
-            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personalBus}}</div>
+            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personalBus}}
+              <i class="el-icon-top" style="color:red" v-if="index==1 && data2[1].personalBus - data2[2].personalBus > 0"></i>
+              <i class="el-icon-bottom" style="color:#999" v-else-if="index==1 && data2[1].personalBus - data2[2].personalBus < 0"></i>
+              <span v-else></span>              
+            </div>
           </el-col>
           <el-col :span="5">
-            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personal}}</div>
+            <div class="grid-content bg-purple" :class="{'f16':item.fontBold}">{{item.personal}}
+              <i class="el-icon-top" style="color:red" v-if="index==1 && data2[1].personal - data2[2].personal > 0"></i>
+              <i class="el-icon-bottom" style="color:#999" v-else-if="index==1 && data2[1].personal - data2[2].personal < 0"></i>
+              <span v-else></span>              
+            </div>
           </el-col>
           <!--<el-col :span="5"><div class="grid-content bg-purple" :class="{'f16':item.fontBold}"></div></el-col>-->
         </el-row>
@@ -318,9 +346,6 @@ export default {
     this.getList()
     this.searchData({ type: 1 }, 0, 2);
   },
-  mounted() {
-
-  },
   methods: {
     searchData(item, index, paramType) {
       if (paramType === 1) {
@@ -395,7 +420,6 @@ export default {
           let result = [...res.data];
           this.dataAdd(result)
         }
-        console.log(res)
       }).catch(err => {
         console.log(err)
       })
@@ -469,9 +493,8 @@ export default {
             chartmainline.setOption(this.options)
             setTimeout(() => {
               chartmainline.resize();
-              console.log(this.optionsUser.series)
             })
-            console.log(1)
+            
           } else if (paramType === 2) {//用户
             this.optionsUser.xAxis.data = x;
             this.optionsUser.series[0].data = y[3];
@@ -481,11 +504,9 @@ export default {
             chartUser.setOption(this.optionsUser);
             setTimeout(() => {
               chartUser.resize();
-              console.log(this.optionsUser.series)
             })
           }
         }
-        console.log(res)
       }).catch(err => {
         console.log(err)
       }).finally(() => {
@@ -518,8 +539,6 @@ export default {
         this.form.endDate = '';
         this.btnList[3].name = `自定义`
       }
-      console.log(this.form.startDate);
-      console.log(this.form.endDate)
       this.getEcharts(1)
     },
     handleChangeDateUser(val) {
@@ -532,8 +551,6 @@ export default {
         this.form.endUserDate = '';
         this.btnUserList[3].name = `自定义`
       }
-      console.log(this.form.startUserDate);
-      console.log(this.form.endUserDate)
       this.getEcharts(2)
     },
   },

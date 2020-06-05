@@ -1,7 +1,15 @@
 import instance from './axios';
 import axios from 'axios';
 import qs from 'qs';
-
+let commonToken = localStorage.getItem('commonToken');
+let baseURL = 'http://test.api.10000rc.com';
+if (process.env.NODE_ENV == 'production') {
+    if (process.env.VUE_APP_TITLE == 'test') {
+        baseURL = 'http://test.api.10000rc.com';
+    } else {
+        baseURL = 'http://www.10000rc.com';
+    }
+}
 const _apiLists = {
     login:(params)=>{
         return instance({
@@ -24,6 +32,24 @@ const _apiLists = {
             method: 'post',
             url: '/orgrimar/appointment/page',
             data,
+        })
+    },
+    skipIntecepeDelRole: (params) => {
+        return axios({
+            headers: {
+                'Content-Type': 'application/json',
+                'os': 'web',
+                'version': '1.0',
+                'apptype': 'web',
+                'equipment': 'web',
+                'equipmentVersion': 'web',
+                'equipmentType': 'web',
+                'userType': '1',
+                Authorization:`Bearer ${commonToken}`
+              },
+            method: 'delete',
+            url: `${baseURL}/user-center/role/del`,
+            params,
         })
     },
     cowToken:()=>{

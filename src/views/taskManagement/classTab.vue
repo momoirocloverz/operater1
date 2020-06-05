@@ -144,8 +144,8 @@
                     this.tableData4 = [
                         {title: '每日排班人数', value: result.authorizedNumber || 0},
                         {title: '所需技能标签', value: [...Object.values(result.industryMap)].join(',')},
-                        {title: '性别要求', value: this.$dictionary.sexLimt[result.sexLimt] || '不限'},
-                        {title: '年龄范围', value: `${result.mageLowerLimit} - ${result.mageUpperLimit}`}
+                        {title: '性别要求', value: this.$dictionary.sexLimt[result.sexLimt]},
+                        {title: '年龄范围', value: result } 
                     ];
                     this.tableData5 = [
                         {title: '开始打卡', value: result.workStartTime},
