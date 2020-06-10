@@ -188,6 +188,7 @@ export default {
           left: '2%',
           right: '2%',
           bottom: '3%',
+          width:'90%',
           containLabel: true
         },
         toolbox: {
@@ -272,6 +273,7 @@ export default {
           left: '2%',
           right: '2%',
           bottom: '3%',
+          width:'90%',
           containLabel: true
         },
         toolbox: {
@@ -342,9 +344,9 @@ export default {
     }
   },
   created() {
-    this.searchData({ type: 1 }, 0, 1);
+    this.searchData({ type: 3 }, 2, 1);
     this.getList()
-    this.searchData({ type: 1 }, 0, 2);
+    this.searchData({ type: 3 }, 2, 2);
   },
   methods: {
     searchData(item, index, paramType) {
@@ -354,6 +356,7 @@ export default {
         this.activeUserIndex = index;
       }
       let type = Number(item.type);
+      console.log(type)
       switch (type) {
         case 1:
           if (paramType === 1) {
@@ -434,20 +437,20 @@ export default {
         fontBold: true
       }, {
         name: '今日数据',
-        busNum: result[0].todayCount,//
-        personalBus: result[1].todayCount,
-        personal: result[2].todayCount,
-        personalReal: result[3].todayCount,
+        busNum: result[1].todayCount,// 企业商家
+        personalBus:  result[0].todayCount, // 个人商家
+        personal: result[2].todayCount, // 个人版用户
+        personalReal: result[3].todayCount, // 个人版实名用户
       }, {
         name: '昨日数据',
-        busNum: result[0].count,//
-        personalBus: result[1].count,
+        busNum: result[1].count,//
+        personalBus: result[0].count,
         personal: result[2].count,
         personalReal: result[3].count,
       }, {
         name: '历史累计',
-        busNum: result[0].totalCount,//
-        personalBus: result[1].totalCount,
+        busNum:result[1].totalCount ,//
+        personalBus:result[0].totalCount ,
         personal: result[2].totalCount,
         personalReal: result[3].totalCount,
       }]
@@ -486,8 +489,8 @@ export default {
           let { x, y } = res.data;
           if (paramType === 1) {//商家
             this.options.xAxis.data = x;
-            this.options.series[0].data = y[1];
-            this.options.series[1].data = y[2];
+            this.options.series[0].data = y[2];
+            this.options.series[1].data = y[1];
             this.handleShowNull(y[1], y[2]);
             let chartmainline = this.$echarts.init(document.getElementById("chartBus"));
             chartmainline.setOption(this.options)

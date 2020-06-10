@@ -91,6 +91,11 @@
                 <div v-if="activeName == 'seventh' ">
                     <Account/>
                 </div>
+                <div v-if="activeName == 'ninth' ">
+                    <Function/>
+                </div>
+                
+                
             </div>
         </div>  
         <el-dialog title="提示" class="setFreezeScoped setMiddleDialog" :visible.sync="freezeVisible" width="450px" :close-on-click-modal="false" center>
@@ -113,12 +118,13 @@
     import CropInfo from './sub/cropInfo.vue'
     import Config from './sub/config.vue'
     import Account from './sub/account.vue'
+    import Function from './sub/function.vue'
     import Attr from './components/attribute'
     import SkillTag from './components/skillTag'
 
     export default {
         name: 'businessDetail',
-        components:{Role,Attr,CropInfo,Account,SkillTag,Config},
+        components:{Role,Attr,CropInfo,Account,SkillTag,Config,Function},
         data() {
             return {
                 freezeVisible:false,
@@ -328,6 +334,15 @@
                                 name: 'fifth'
                             })
                         }
+                        
+                        if( this.AuthBoolean('33') ){
+                            empty2.push({
+                                title: '功能配置',
+                                name: 'ninth'
+                            })
+                        }
+                        
+                        
                         this.restTabArr = empty2;
                  /*       this.restTabArr = [
                             {title: '服务配置', name: 'second'},

@@ -18,6 +18,11 @@
                 <el-switch v-model="punchManageSwitch" active-color="#FF2626" inactive-color="#DCDFE6" active-value="1" inactive-value="0" @change="punchSwitch" :disabled="!AuthBoolean('66')"></el-switch>
                 <div class="setleftMargin">{{ punchManageMap[punchManageSwitch] }}</div>
             </div>
+            <div class="thirdSelectCon">
+                <div  class="radioTitle">排班打卡功能：</div>
+            <!--    <el-switch v-model="punchManageSwitch" active-color="#FF2626" inactive-color="#DCDFE6" active-value="1" inactive-value="0" @change="punchSwitch" :disabled="!AuthBoolean('66')"></el-switch>-->
+                <div class="setleftMargin">{{ punchManageMap[punchManageSwitch] }}</div>
+            </div>            
         </div>
         <div>
             <div class="itemTitle">管理费账户</div>
@@ -33,6 +38,32 @@
                             <div v-if="scope.row.index == 1">
                                 {{ scope.row.feeAmount ? scope.row.feeAmount +'元/笔' :'无'   }}
                             </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="feeStatus" label="状态">
+                        <template v-slot="scope">{{ scope.row.feeStatus == 1 ? '启用' : '不启用' }}</template>
+                    </el-table-column>
+                    <el-table-column label="操作" v-if="AuthBoolean(['67'])">
+                        <template v-slot="scope">
+                            <div v-if="scope.row.index == 1">
+                                <el-button type="text" size="small" @click="setPop(scope.row)" v-Auth="'67'">设 置</el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+        <div class="tableConMargin">
+            <div class="itemTitle">打卡排班</div>
+            <div class="">
+                <el-table :data="tableData22" border style="width: 100%; margin-top: 20px">
+                    <el-table-column prop="des" label="费用类型（对外显示名）"></el-table-column>
+                    <el-table-column prop="description" label="费用说明"></el-table-column>
+                    <el-table-column prop="feeEmp" label="是否向零工扣费">
+                        <template v-slot="scope">{{ scope.row.feeEmp == 1 ? '是' :'否' }}</template>
+                    </el-table-column>
+                    <el-table-column prop="feeAmount" label="金额">
+                        <template v-slot="scope">
                             <div v-if="scope.row.index == 2">
                                 <div v-if="scope.row.forDisplay && scope.row.forDisplay.length"> 
                                     <template v-for="(subItem,subIndex) in scope.row.forDisplay" >
@@ -49,13 +80,50 @@
                     <el-table-column prop="feeStatus" label="状态">
                         <template v-slot="scope">{{ scope.row.feeStatus == 1 ? '启用' : '不启用' }}</template>
                     </el-table-column>
-                    <el-table-column label="操作" v-if="AuthBoolean(['67','68'])">
+                    <el-table-column label="操作" v-if="AuthBoolean(['68'])">
                         <template v-slot="scope">
-                            <div v-if="scope.row.index == 1">
-                                <el-button type="text" size="small" @click="setPop(scope.row)" v-Auth="'67'">设 置</el-button>
-                            </div>
                             <div v-if="scope.row.index == 2">
                                 <el-button type="text" size="small" @click="setPop(scope.row)" v-Auth="'68'">设 置</el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+        <div class="tableConMargin">
+            <div class="itemTitle">不打卡排班</div>
+            <div class="">
+                <el-table :data="tableData23" border style="width: 100%; margin-top: 20px">
+                    <el-table-column prop="des" label="费用类型（对外显示名）"></el-table-column>
+                    <el-table-column prop="description" label="费用说明"></el-table-column>
+                    <el-table-column prop="feeEmp" label="扣费时间">
+                        <template v-slot="scope"></template>
+                    </el-table-column>
+                    <el-table-column prop="feeEmp" label="是否向零工扣费">
+                        <template v-slot="scope">{{ scope.row.feeEmp == 1 ? '是' :'否' }}</template>
+                    </el-table-column>
+                    <el-table-column prop="feeAmount" label="金额">
+                        <template v-slot="scope">
+                            <div v-if="scope.row.index == 2">
+                                <div v-if="scope.row.forDisplay && scope.row.forDisplay.length"> 
+                                    <template v-for="(subItem,subIndex) in scope.row.forDisplay" >
+                                        <div>
+                                            <span class="mr20">{{ subItem && subItem.attributeName}}</span>
+                                            <span>{{subItem && subItem.amount}}元/天</span>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div v-else>无</div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="feeStatus" label="状态">
+                        <template v-slot="scope">{{ scope.row.feeStatus == 1 ? '启用' : '不启用' }}</template>
+                    </el-table-column>
+                    <el-table-column label="操作" v-if="AuthBoolean(['68'])">
+                        <template v-slot="scope">
+                            <div v-if="scope.row.index == 2">
+                                <el-button type="text" size="small" @click="setPopSp(scope.row)" v-Auth="'68'">设 置</el-button>
                             </div>
                         </template>
                     </el-table-column>
@@ -128,7 +196,7 @@
                 </el-form>
             </div>
         </el-dialog>
-        <el-dialog title="系统使用费 设置" class="setRootSpScoped setMiddleDialog" :visible.sync="insuranceVisible" width="1000px" :close-on-click-modal="false" center>
+        <el-dialog title="打卡排班—系统使用费设置" class="setRootSpScoped setMiddleDialog" :visible.sync="insuranceVisible" width="1000px" :close-on-click-modal="false" center>
             <div>
                 <el-form :model="insuranceForm" status-icon :rules="insuranceRules" ref="insuranceForm"
                          label-width="120px" class="demo-ruleForm">
@@ -188,6 +256,95 @@
                             </div>
                         </template>
                         <el-form-item v-show="insuranceForm.radio1 == 3">
+                            <div class="flexThreeItem">
+                                <template v-for="(item,index) in dynamicAmoArray">
+                                    <div class="thirdFlex">
+                                        <div>{{item.name}}系统使用费：</div>
+                                        <div>{{item.dynamicAmount}}元/天</div>
+                                    </div>
+                                </template>
+                            </div>
+                        </el-form-item>
+                    </div>
+                    <div class="flexHere">
+                        <el-button type="primary" size="small" class="sameWidthBtn"
+                                   @click="submitInsuranceFormPass('insuranceForm')">确 定</el-button>
+                        <el-button type="info" size="small" class="sameWidthBtn"
+                                   @click="cancelInsuranceFormPass('insuranceForm')">取 消</el-button>
+                    </div>
+                </el-form>
+            </div>
+        </el-dialog>
+
+
+
+        <el-dialog title="不打卡排班—系统使用费设置" class="setRootSpScoped setMiddleDialog" :visible.sync="insuranceInverseVisible" width="1000px" :close-on-click-modal="false" center>
+            <div>
+                <el-form :model="insuranceInverseForm" status-icon :rules="insuranceInverseRules" ref="insuranceInverseForm"
+                         label-width="140px" class="demo-ruleForm">
+                    <div class="innerDialogCon">
+                        <el-form-item label="功能是否启用">
+                            <el-radio-group v-model.trim="insuranceInverseForm.radio1">
+                                <el-radio :label="3">启用</el-radio>
+                                <el-radio :label="6">不启用</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="是否向人员收费" v-show="insuranceInverseForm.radio1 == 3">
+                            <el-radio-group v-model.trim="insuranceInverseForm.radio2">
+                                <el-radio :label="3">是</el-radio>
+                                <el-radio :label="6">否</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="不打卡排班扣费时间" v-show="insuranceInverseForm.radio1 == 3">
+                            <el-radio-group v-model.trim="insuranceInverseForm.radio3">
+                                <div class="resetRadio"><el-radio :label="3">排班预期开始时间：到排班预期开始时间，自动扣系统使用费，且购买保险</el-radio></div>
+                                <div><el-radio :label="6">排班日期00：00：到排班日期00：00，自动扣系统使用费，且购买保险</el-radio></div>
+                            </el-radio-group>
+                            <div>其余在预期开始至结束时间内加入排班的人员，将自动扣费且购买保险</div>
+                        </el-form-item>                        
+                        <el-form-item label="设置系统使用费" class="boldItem" v-show="insuranceInverseForm.radio1 == 3"></el-form-item>
+                        <el-form-item label="平台使用费" prop="price" v-show="insuranceInverseForm.radio1 == 3">
+                            <div class="inputInnerFlex">
+                                <el-input class="inputInnerSelf" v-model.trim="insuranceInverseForm.price" size="small"  placeholder="请输入" maxlength="10" clearable @change="priceChange"></el-input>
+                                <div>元/天</div>
+                            </div>
+                        </el-form-item>
+                        <el-form-item label="设置保险" class="boldItem" v-show="insuranceInverseForm.radio1 == 3"></el-form-item>
+                        
+                        <template v-for="(item,index) in dynamicAmoArray" >
+                            <div v-show="insuranceInverseForm.radio1 == 3">
+                                <el-form-item :label="item.name">
+                                    <el-radio-group v-model.trim="item.able" @change="ableChange(index,item.able)">
+                                        <el-radio :label="3">需要</el-radio>
+                                        <el-radio :label="6">不需要</el-radio>
+                                    </el-radio-group>
+                                </el-form-item>
+                                <el-form-item label="选择保险套餐" class="boldItem" :prop="'check' + index + 'Table'" v-show="item.able == 3">
+                                    <div>共{{insuranceTotal}}个，已选{{item.multipleSelection.length}}个</div>
+                                    <el-table :data="item.tableDataDialog" max-height="350" border style="width: 100%; margin-top: 20px" @selection-change="(val)=>handleSelectionChange(val,index)"  :ref="'multiple'+index+'Table'" :key="'special' + index">
+                                        <el-table-column prop="id" label="保险ID" show-overflow-tooltip width="100"></el-table-column>
+                                        <el-table-column prop="insuName" label="保险名称" show-overflow-tooltip width="100"></el-table-column>
+                                        <el-table-column label="有效时间" show-overflow-tooltip width="80">
+                                            <template slot-scope="scope">1天</template>
+                                        </el-table-column>
+                                        <el-table-column prop="company" label="保险公司" show-overflow-tooltip width="100"></el-table-column>
+                                        <el-table-column prop="instruction" label="保额" show-overflow-tooltip width="100"></el-table-column>
+                                        <el-table-column prop="insuFee" label="成本(元/笔)" show-overflow-tooltip width="100"></el-table-column>
+                                        <el-table-column type="selection" label="选择" width="50"></el-table-column>
+                                        <el-table-column label="单价(元/天)">
+                                            <template v-slot="scope">
+                                                <el-input-number size="small" v-model="scope.row.amount" @change="(value)=>tableItemChange(value,index)" :precision="2" controls-position="right"  :min="0" :max="9999999999"/>
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
+                                    <div class="pagCon" v-if="showInsurancePag">
+                                        <el-pagination  @current-change="(val)=>handleInsCurrentChange(val,index)" :current-page.sync="item.currentPage" :page-size="50" layout="prev, pager, next, jumper" :total="insuranceTotal">
+                                        </el-pagination>
+                                    </div>
+                                </el-form-item>                                
+                            </div>
+                        </template>
+                        <el-form-item v-show="insuranceInverseForm.radio1 == 3">
                             <div class="flexThreeItem">
                                 <template v-for="(item,index) in dynamicAmoArray">
                                     <div class="thirdFlex">
@@ -318,6 +475,11 @@
             return {                
                 tableData21: [
                     {des: '付款手续费', index: 1,description:'每次付款 每个用户每笔费用付款',  },
+                ],
+                tableData22: [
+                    {des: '系统使用费', index: 2,description:'每人每次开工打卡扣除系统使用费，当天排班扣1天系统使用费，跨天排班扣2天使用费，同一用户同一商家下同一天不重复扣费'  },  
+                ],
+                tableData23: [
                     {des: '系统使用费', index: 2,description:'每人每次开工打卡扣除系统使用费，当天排班扣1天系统使用费，跨天排班扣2天使用费，同一用户同一商家下同一天不重复扣费'  },  
                 ],
                 emptyTalentText:'不启用',
@@ -338,7 +500,27 @@
                         { validator: validateComPrice, trigger: 'blur' },
                     ],
                 },
-                insuranceVisible: false,  
+                insuranceInverseVisible:false,
+                insuranceInverseForm: {
+                    radio1: 3,
+                    radio2: 6, 
+                    radio3: 3, 
+                    price:'',
+                    regular:6,
+                    labor:6,
+                    temporary:6,
+                },
+                insuranceInverseRules: {
+                    price:[
+                        { validator: validatePlatPrice, trigger: 'blur' },
+                    ],
+                    check0Table:[
+                        { validator: validateTable, trigger: 'blur' },
+                    ]
+                },
+                
+                
+                insuranceVisible: false,                  
                 insuranceForm: {
                     radio1: 3,
                     radio2: 6, 
@@ -688,6 +870,9 @@
             cancelAuthPass(formName){
                 this.authVisible = false;
             },
+            setPopSp(scope){
+                this.insuranceInverseVisible = true;
+            },
             setPop(scope) {
                 switch (scope.index) {
                     case 2:
@@ -863,6 +1048,8 @@
                                 feeEmp: item1&&item1.feeEmp ? item1.feeEmp : 0,
                                 id:item1&&item1.id ? item1.id : '',
                             },
+                        ];                         
+                        this.tableData22 = [
                             {
                                 des: '系统使用费', 
                                 index: 2,description:'每人每次开工打卡扣除系统使用费，当天排班扣1天系统使用费，跨天排班扣2天使用费，同一用户同一商家下同一天不重复扣费',
@@ -873,8 +1060,8 @@
                                 systemFeeDetailVOList:item2&&item2.systemFeeDetailVOList ? item2.systemFeeDetailVOList : [],
                                 forDisplay:[],
                             },
-                        ]; 
-                        let trackItem = this.tableData21.find(ele=>{
+                        ];                        
+                        let trackItem = this.tableData22.find(ele=>{
                             return ele.index == 2
                         })                         
                         let trackItem2 = trackItem.systemFeeDetailVOList.find(ele=>{
@@ -937,6 +1124,13 @@
 </script>
 <style scoped lang="scss">
     .configInnerCon {
+        .tableConMargin {
+            margin-top: 20px;
+        }
+        .resetRadio {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
         .flexThreeItem {
             display: flex;
             justify-content:flex-start;
@@ -964,6 +1158,18 @@
             margin-top: 10px;
             font-weight: 500;
         }
+        
+        .thirdSelectCon {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-start;
+            align-content: center;
+            align-items: center;
+            .setleftMargin {
+                margin-left: 10px;
+            }
+        }
+        
         .secondSelectCon {
             margin-top: 20px;
             display: flex;
