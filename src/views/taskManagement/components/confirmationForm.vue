@@ -28,9 +28,15 @@
                     schedulingId:this.$route.query.schedulingId
                 }).then(res => {
                     //状态（1待发送、2待确认、3已确认） status
-                    if(res.data && [2,3].includes(res.data.status)){
+                    /*if(res.data && [2,3].includes(res.data.status)){
                         this.confirmStatus = res.data.status
                         this.isShow = true;
+                        this.url = res.data.confirmPngForm
+                    }else{
+                        this.isShow = false
+                    }*/
+                    if( res.data && res.data.status ){
+                        this.confirmStatus = res.data.status
                         this.isShow = true;
                         this.url = res.data.confirmPngForm
                     }else{

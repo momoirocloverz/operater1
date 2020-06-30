@@ -156,12 +156,13 @@
                 }
             },
             forProcessStatus(row,col,val){
+                // 未开始 进行中 已结束 已关闭  原状态
                 if(val === 1){
-                    return '未开始'
+                    return '待执行'
                 }else if(val === 2){
-                    return '进行中'
+                    return '待结算'
                 }else if(val === 3){
-                    return '已结束'
+                    return '已完成'
                 }else if(val === 4){
                     return '已关闭'
                 }else{

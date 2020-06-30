@@ -199,6 +199,13 @@ const routes = [
                             return import(/* webpackChunkName: "systemMana" */ '../views/operationManagement/advertisement/list.vue')
                         },
                     },
+                    {
+                        path: 'startScreenList',
+                        name: 'operationManaStartScreenList',
+                        component: function () {
+                            return import(/* webpackChunkName: "systemMana" */ '../views/operationManagement/startScreen/list.vue')
+                        },
+                    },
                 ]
             },
         ]

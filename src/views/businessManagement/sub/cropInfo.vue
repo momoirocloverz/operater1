@@ -113,7 +113,7 @@
                     if( this.clickSource == 2 ){
                         if( sessionStorage.getItem('tempPicsSucker') ){
                             this.storePicData = JSON.parse(sessionStorage.getItem('tempPicsSucker'));
-                            this.imageUrl2 = this.storePicData.logo;
+                            this.imageUrl2 = this.storePicData.background;
                         }
                     }
                 }

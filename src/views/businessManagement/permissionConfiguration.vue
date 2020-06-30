@@ -2,8 +2,9 @@
   <div class="role-permission bg-fff">
     <div class="flex-box flex-center">
       <div>
-        <el-tree :data="data" default-expand-all show-checkbox check-on-click-node node-key="permCode" :check-strictly="checkShow" ref="tree" highlight-current :props="defaultProps">
+        <el-tree :data="data" default-expand-all show-checkbox check-on-click-node node-key="permCode" :check-strictly="true" ref="tree" highlight-current :props="defaultProps">
         </el-tree>
+          <!--  :check-strictly="checkShow" -->
         <!--@check="clickDeal"-->
         <div class="buttons tc pt20 pb20">
           <el-button type="primary" class="el-input-width" @click="saveCheck">保存</el-button>
@@ -46,12 +47,10 @@ export default {
           let result = res.data.rolePermissionList || [];
           this.permCodeList = [...result.map(i => i.permCode)];
           // this.$refs.tree.setCheckedNodes(this.permCodeList);
-          console.log(this.permCodeList)
           _this.checkShow = true;
           this.$refs.tree.setCheckedKeys(this.permCodeList);
           setTimeout(()=>{
             _this.checkShow = false;
-            console.log(this.checkShow)
           },200)
         }
       }).catch(err => {
@@ -70,7 +69,7 @@ export default {
 
       })
     },
-    clickDeal(currentObj, treeStatus) {
+    clickDeal(currentObj, treeStatus) {        
       // 用于：父子节点严格互不关联时，父节点勾选变化时通知子节点同步变化，实现单向关联。
       let selected = treeStatus.checkedKeys.indexOf(currentObj.permCode) // -1未选中
       // 选中
@@ -85,11 +84,13 @@ export default {
           this.uniteChildSame(currentObj, false)
         }
       }
+        
+        
+        
     },
     // 统一处理子节点为相同的勾选状态
     uniteChildSame(treeList, isSelected) {
       let len = treeList && treeList.sonList && treeList.sonList.length > 0;
-      console.log(len)
       this.$refs.tree.setChecked(treeList.permCode, isSelected)
       for (let i = 0; i < len; i++) {
         this.uniteChildSame(treeList.sonList[i], isSelected)

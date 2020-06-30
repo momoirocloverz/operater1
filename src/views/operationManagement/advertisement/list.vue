@@ -55,7 +55,7 @@
                     <el-table-column prop="name" label="广告名称" width="" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="device" label="上架端口" :formatter="forDevice" width="" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="location" label="广告位置" width="" :formatter="forLocation"></el-table-column>
-                    <el-table-column prop="displayObj" label="显示对象" width="" :formatter="forDisplayObj"></el-table-column>
+                    <el-table-column label="显示对象" width="" :formatter="forDisplayObj"></el-table-column>
                     <el-table-column prop="jumpWay" label="跳转方式" width="" :formatter="forJumpWay"></el-table-column>
                     <el-table-column prop="" label="跳转地址" width="200">
                         <template v-slot="scope">
@@ -98,21 +98,23 @@
                         <!--<el-option label="不限" value="-1"></el-option>-->
                         <el-option label="企业版app-ios" :value="1"></el-option>
                         <el-option label="企业版app-安卓" :value="2"></el-option>
-                        <!--<el-option label="个人版app-ios" :value="3"></el-option>-->
-                        <!--<el-option label="个人版app-安卓" :value="4"></el-option>-->
-                        <!--<el-option label="企业版pc" :value="5"></el-option>-->
+                        <el-option label="个人版app-ios" :value="3"></el-option>
+                        <el-option label="个人版app-安卓" :value="4"></el-option>
+                        <el-option label="企业版pc" :value="5"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item prop="user" label="显示对象" label-width="200px">
                     <el-radio-group v-model="inforForm.user">
-                        <el-radio :label="1">全部商家</el-radio>
-                        <el-radio :label="2">企业商家</el-radio>
-                        <el-radio :label="3">个人商家</el-radio>
+                        <el-radio :label="1" v-if=" inforForm.port == 1 || inforForm.port == 2 || inforForm.port == 5 || !inforForm.port ">全部商家</el-radio>
+                        <el-radio :label="2" v-if=" inforForm.port == 1 || inforForm.port == 2 || inforForm.port == 5 || !inforForm.port">企业商家</el-radio>
+                        <el-radio :label="3" v-if=" inforForm.port == 1 || inforForm.port == 2 || inforForm.port == 5 || !inforForm.port ">个人商家</el-radio>
+                        <el-radio :label="4" v-if=" inforForm.port == 3 || inforForm.port == 4">个人用户</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item prop="position" label="广告位置" label-width="200px">
                     <el-select v-model="inforForm.position" size="small" placeholder="选择广告位置">
-                        <el-option label="banner" :value="1"></el-option>
+                        <el-option label="个人版工作台banner" :value="1"></el-option>
+                        <el-option label="pc端首页轮播" :value="2"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item prop="jump" label="跳转方式" label-width="200px">
@@ -209,10 +211,26 @@
             };
             return {
                 options: [{name:'不限',value:-1},{name:'未上架',value:0},{name:'已上架',value:1}],
-                options1: [{name:'不限',value:-1},{name:'全部商家',value:1},{name:'企业商家',value:2},{name:'个人商家',value:3}],
-                options3: [{name:'不限',value:-1},{name:'banner',value:1}],
-                // ,{name:'个人版app-ios',value:'3'},{name:'个人版app-安卓',value:'4'},{name:'企业版pc',value:'5'}
-                options2: [{name:'不限',value:-1},{name:'企业版app-ios',value:'1'},{name:'企业版app-安卓',value:'2'}],
+                options1: [
+                    {name:'不限',value:-1},
+                    {name:'全部商家',value:1},
+                    {name:'企业商家',value:2},
+                    {name:'个人商家',value:3},
+                    {name:'个人用户',value:4}
+                ],
+                options3: [
+                    {name:'不限',value:-1},
+                    {name:'个人版工作台banner',value:1},
+                    {name:'pc端首页轮播',value:2}
+                ],
+                options2: [
+                    {name:'不限',value:-1},
+                    {name:'企业版app-ios',value:'1'},
+                    {name:'企业版app-安卓',value:'2'},
+                    {name:'个人版app-ios',value:'3'},
+                    {name:'个人版app-安卓',value:'4'},
+                    {name:'企业版pc端',value:'5'}
+                ],
                 form: {
                     title:'',
                     startDate: '',
@@ -453,28 +471,37 @@
                 }else if(Number(val) === 2){
                     return '企业版app-安卓'
                 }else if(Number(val) === 3){
-                    return '个人版app-ios'
-                }else if(Number(val) === 4){
-                    return '个人版app-安卓'
-                }else if(Number(val) === 5){
+                     return '个人版app-ios'
+                 }else if(Number(val) === 4){
+                     return '个人版app-安卓'
+                 }else if(Number(val) === 5){
                     return '企业版pc'
                 }else{
                     return ''
                 }
             },
-            forDisplayObj(row,col,val){
-                if(Number(val) === 1){
-                    return '全部商家2'
-                }else if(Number(val) === 2){
-                    return '企业商家3'
-                }else if(Number(val) === 3){
-                    return '个人商家'
-                }else{
-                    return ''
+            forDisplayObj(row,col){
+                switch (row.displayObj){
+                        case 1:
+                            return '全部商家'
+                            break;
+                        case 2:
+                            return '企业商家'
+                            break;
+                        case 3:
+                            return '个人商家'
+                            break;
+                        case 4:
+                            return '个人用户'
+                            break;
+                    default:
+                        return '-'
                 }
             },forLocation(row,col,val){
                 if(Number(val) === 1){
                     return 'banner'
+                }else if(Number(val) === 2){
+                    return 'pc端首页轮播'
                 }else{
                     return ''
                 }
@@ -531,7 +558,6 @@
             handleSizeChange(val) {
                 this.currentPage = val
                 this.getList()
-                this.getTotal()
             },
             handleChangeDateRange(val) {
                 if(val){
@@ -545,7 +571,6 @@
             handleCurrentChange(val) {
                 this.currentPage = val
                 this.getList()
-                this.getTotal()
             },
         },
     }

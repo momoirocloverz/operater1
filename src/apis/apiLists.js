@@ -1,6 +1,7 @@
 import instance from './axios';
 import axios from 'axios';
 import qs from 'qs';
+import { Loading } from 'element-ui';
 let commonToken = localStorage.getItem('commonToken');
 let baseURL = 'http://test.api.10000rc.com';
 if (process.env.NODE_ENV == 'production') {
@@ -58,6 +59,34 @@ const _apiLists = {
             url: '/orgrimar/qiniu/token',
         })
     },
+    cowSpToken:(params)=>{
+        return instance({
+            method: 'get',
+            url: '/orgrimar/qiniu/token2',
+            params
+        })
+    },
+    standAloneUpload(data){
+        let loadingInstance = Loading.service({
+            lock: true,
+            spinner: 'el-icon-loading',
+            background: 'rgba(255, 255, 255, 0.9)'
+        });
+        return axios({
+            method: 'post',
+            url: 'http://upload.qiniu.com/',
+            data,
+            onUploadProgress: function (progressEvent) {
+                if( progressEvent.loaded >= progressEvent.total ){
+                    loadingInstance.close();
+                }else{
+                    setTimeout(()=>{
+                        loadingInstance.close();
+                    },180000)
+                }
+            }
+        })
+    },
     businessCustomerList:(data)=>{
         return instance({
             method: 'post',
@@ -105,6 +134,69 @@ const _apiLists = {
             method: 'post',
             url: '/user-center/customerFeeSetting/save/systemFee',
             data
+        })
+    }, 
+    feeSettingDetail:(params)=>{
+        return instance({
+            method: 'get',
+            url: '/user-center/customerFeeSetting/detail',
+            params
+        })
+    }, 
+    advertisementPageAdd:(data)=>{
+        return instance({
+            method: 'post',
+            url: '/orgrimar/advertisementPage/add',
+            data
+        })
+    }, 
+    fetchAdvertisementPage:(params)=>{
+        return instance({
+            method: 'get',
+            url: '/orgrimar/advertisementPage/list',
+            params
+        })
+    }, 
+    waterMark:(params)=>{
+        return instance({
+            method: 'get',
+            url: '/orgrimar/sysparam/n/value',
+            params
+        })
+    }, 
+    toggleAppVersion:(params)=>{
+        return instance({
+            method: 'put',
+            url: '/orgrimar/appVersion/toggle',
+            params
+        })
+    },    
+    appVersionModify:(data)=>{
+        return instance({
+            method: 'post',
+            url: '/orgrimar/appVersion/modify',
+            data
+        })
+    }, 
+    toggleEmptyPdfExportSwitch:(params)=>{
+        return instance({
+            method: 'put',
+            url: '/user-center/customer/emptyPdfExportSwitch/toggle',
+            params
+        })
+    },  
+    toggleAdvertisementPage:(params)=>{
+        return instance({
+            method: 'put',
+            url: '/orgrimar/advertisementPage/toggle',
+            params
+        })
+    },     
+    setPunchType:(params)=>{
+        return instance({
+            method: 'get',
+            url: '/user-center/customer/setPunchType',
+            params
         })
     }, 
     getCusAccountList:(data)=>{
@@ -805,6 +897,14 @@ const _apiLists = {
             params,
         })
     },
+    //  个人商家升级为企业商家
+    personaLupgrade: (data) => {
+      return instance({
+        method : 'post',
+        url: '/user-center/customer/upgradeEnterprise',
+        data,
+      }) 
+    }
 };
 export default {
     install: function(Vue) {

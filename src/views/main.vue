@@ -303,7 +303,13 @@ export default {
                             path:'/main/operationMana/advertisementList',
                             index:'9-3',
                             auth:'222',
-                        }
+                        },
+                        {
+                            title:'广告页管理',
+                            path:'/main/operationMana/startScreenList',
+                            index:'9-4',
+                            auth:'22201',
+                        },
                     ],
                 },
             ],

@@ -1,4 +1,5 @@
-<template>
+
+    <template>
     <div class="configInnerCon">
         <div class="setMargin2">
             <div class="itemTitle">功能权限</div>
@@ -19,9 +20,11 @@
                 <div class="setleftMargin">{{ punchManageMap[punchManageSwitch] }}</div>
             </div>
             <div class="thirdSelectCon">
-                <div  class="radioTitle">排班打卡功能：</div>
-            <!--    <el-switch v-model="punchManageSwitch" active-color="#FF2626" inactive-color="#DCDFE6" active-value="1" inactive-value="0" @change="punchSwitch" :disabled="!AuthBoolean('66')"></el-switch>-->
-                <div class="setleftMargin">{{ punchManageMap[punchManageSwitch] }}</div>
+                <div  class="radioTitle">打卡要求：</div>
+                <el-checkbox-group v-model="checkList"  @change="changeHere">
+                    <el-checkbox v-for="(item,index) in checkArray" disabled :label="item.text" :key="item.value" >{{item.text}}</el-checkbox>
+                </el-checkbox-group>
+                <el-button class="ml20" type="primary" size="small" v-Auth="'6801'" @click="popEditArray">编辑</el-button>
             </div>            
         </div>
         <div>
@@ -96,15 +99,15 @@
                 <el-table :data="tableData23" border style="width: 100%; margin-top: 20px">
                     <el-table-column prop="des" label="费用类型（对外显示名）"></el-table-column>
                     <el-table-column prop="description" label="费用说明"></el-table-column>
-                    <el-table-column prop="feeEmp" label="扣费时间">
-                        <template v-slot="scope"></template>
+                    <el-table-column  label="扣费时间">
+                        <template v-slot="scope">{{scope.row.time}}</template>
                     </el-table-column>
                     <el-table-column prop="feeEmp" label="是否向零工扣费">
                         <template v-slot="scope">{{ scope.row.feeEmp == 1 ? '是' :'否' }}</template>
                     </el-table-column>
                     <el-table-column prop="feeAmount" label="金额">
                         <template v-slot="scope">
-                            <div v-if="scope.row.index == 2">
+                            <div>
                                 <div v-if="scope.row.forDisplay && scope.row.forDisplay.length"> 
                                     <template v-for="(subItem,subIndex) in scope.row.forDisplay" >
                                         <div>
@@ -122,7 +125,7 @@
                     </el-table-column>
                     <el-table-column label="操作" v-if="AuthBoolean(['68'])">
                         <template v-slot="scope">
-                            <div v-if="scope.row.index == 2">
+                            <div>
                                 <el-button type="text" size="small" @click="setPopSp(scope.row)" v-Auth="'68'">设 置</el-button>
                             </div>
                         </template>
@@ -221,7 +224,6 @@
                             </div>
                         </el-form-item>
                         <el-form-item label="设置保险" class="boldItem" v-show="insuranceForm.radio1 == 3"></el-form-item>
-                        
                         <template v-for="(item,index) in dynamicAmoArray" >
                             <div v-show="insuranceForm.radio1 == 3">
                                 <el-form-item :label="item.name">
@@ -275,13 +277,10 @@
                 </el-form>
             </div>
         </el-dialog>
-
-
-
-        <el-dialog title="不打卡排班—系统使用费设置" class="setRootSpScoped setMiddleDialog" :visible.sync="insuranceInverseVisible" width="1000px" :close-on-click-modal="false" center>
+        <el-dialog title="不打卡排班—系统使用费设置" class="setRootSpScoped setMiddleDialog" :visible.sync="insuranceInverseVisible" width="1000px" :close-on-click-modal="false" center :before-close="handleClose2">
             <div>
                 <el-form :model="insuranceInverseForm" status-icon :rules="insuranceInverseRules" ref="insuranceInverseForm"
-                         label-width="140px" class="demo-ruleForm">
+                         label-width="130px" class="demo-ruleForm">
                     <div class="innerDialogCon">
                         <el-form-item label="功能是否启用">
                             <el-radio-group v-model.trim="insuranceInverseForm.radio1">
@@ -295,33 +294,29 @@
                                 <el-radio :label="6">否</el-radio>
                             </el-radio-group>
                         </el-form-item>
-                        <el-form-item label="不打卡排班扣费时间" v-show="insuranceInverseForm.radio1 == 3">
-                            <el-radio-group v-model.trim="insuranceInverseForm.radio3">
-                                <div class="resetRadio"><el-radio :label="3">排班预期开始时间：到排班预期开始时间，自动扣系统使用费，且购买保险</el-radio></div>
-                                <div><el-radio :label="6">排班日期00：00：到排班日期00：00，自动扣系统使用费，且购买保险</el-radio></div>
-                            </el-radio-group>
-                            <div>其余在预期开始至结束时间内加入排班的人员，将自动扣费且购买保险</div>
+                        <el-form-item label="排班执行时间/系统使用费扣费时间" prop="startTime" v-show="insuranceInverseForm.radio1 == 3">
+                          <span class="mr20">排班日期当天00:00</span>
+                            <div>晚于该时间点添加人员至当天排班或新建当天排班将直接收取系统使用费</div>
                         </el-form-item>                        
                         <el-form-item label="设置系统使用费" class="boldItem" v-show="insuranceInverseForm.radio1 == 3"></el-form-item>
                         <el-form-item label="平台使用费" prop="price" v-show="insuranceInverseForm.radio1 == 3">
                             <div class="inputInnerFlex">
-                                <el-input class="inputInnerSelf" v-model.trim="insuranceInverseForm.price" size="small"  placeholder="请输入" maxlength="10" clearable @change="priceChange"></el-input>
+                                <el-input class="inputInnerSelf" v-model.trim="insuranceInverseForm.price" size="small"  placeholder="请输入" maxlength="10" clearable @change="priceCopyChange"></el-input>
                                 <div>元/天</div>
                             </div>
                         </el-form-item>
                         <el-form-item label="设置保险" class="boldItem" v-show="insuranceInverseForm.radio1 == 3"></el-form-item>
-                        
-                        <template v-for="(item,index) in dynamicAmoArray" >
+                        <template v-for="(item,index) in dynamicCopyAmoArray" >
                             <div v-show="insuranceInverseForm.radio1 == 3">
                                 <el-form-item :label="item.name">
-                                    <el-radio-group v-model.trim="item.able" @change="ableChange(index,item.able)">
+                                    <el-radio-group v-model.trim="item.able" @change="ableCopyChange(index,item.able)">
                                         <el-radio :label="3">需要</el-radio>
                                         <el-radio :label="6">不需要</el-radio>
                                     </el-radio-group>
                                 </el-form-item>
                                 <el-form-item label="选择保险套餐" class="boldItem" :prop="'check' + index + 'Table'" v-show="item.able == 3">
-                                    <div>共{{insuranceTotal}}个，已选{{item.multipleSelection.length}}个</div>
-                                    <el-table :data="item.tableDataDialog" max-height="350" border style="width: 100%; margin-top: 20px" @selection-change="(val)=>handleSelectionChange(val,index)"  :ref="'multiple'+index+'Table'" :key="'special' + index">
+                                    <div>共{{insuranceCopyTotal}}个，已选{{item.multipleSelection.length}}个</div>
+                                    <el-table :data="item.tableDataDialog" max-height="350" border style="width: 100%; margin-top: 20px" @selection-change="(val)=>handleSelectionCopyChange(val,index)"  :ref="'multipleCopy'+index+'Table'" :key="'special' + index">
                                         <el-table-column prop="id" label="保险ID" show-overflow-tooltip width="100"></el-table-column>
                                         <el-table-column prop="insuName" label="保险名称" show-overflow-tooltip width="100"></el-table-column>
                                         <el-table-column label="有效时间" show-overflow-tooltip width="80">
@@ -333,12 +328,12 @@
                                         <el-table-column type="selection" label="选择" width="50"></el-table-column>
                                         <el-table-column label="单价(元/天)">
                                             <template v-slot="scope">
-                                                <el-input-number size="small" v-model="scope.row.amount" @change="(value)=>tableItemChange(value,index)" :precision="2" controls-position="right"  :min="0" :max="9999999999"/>
+                                                <el-input-number size="small" v-model="scope.row.amount" @change="(value)=>tableItemCopyChange(value,index)" :precision="2" controls-position="right"  :min="0" :max="9999999999"/>
                                             </template>
                                         </el-table-column>
                                     </el-table>
-                                    <div class="pagCon" v-if="showInsurancePag">
-                                        <el-pagination  @current-change="(val)=>handleInsCurrentChange(val,index)" :current-page.sync="item.currentPage" :page-size="50" layout="prev, pager, next, jumper" :total="insuranceTotal">
+                                    <div class="pagCon" v-if="show2InsurancePag">
+                                        <el-pagination  @current-change="(val)=>handleInsCurrentChange(val,index)" :current-page.sync="item.currentPage" :page-size="50" layout="prev, pager, next, jumper" :total="insuranceCopyTotal">
                                         </el-pagination>
                                     </div>
                                 </el-form-item>                                
@@ -346,7 +341,7 @@
                         </template>
                         <el-form-item v-show="insuranceInverseForm.radio1 == 3">
                             <div class="flexThreeItem">
-                                <template v-for="(item,index) in dynamicAmoArray">
+                                <template v-for="(item,index) in dynamicCopyAmoArray">
                                     <div class="thirdFlex">
                                         <div>{{item.name}}系统使用费：</div>
                                         <div>{{item.dynamicAmount}}元/天</div>
@@ -357,16 +352,13 @@
                     </div>
                     <div class="flexHere">
                         <el-button type="primary" size="small" class="sameWidthBtn"
-                                   @click="submitInsuranceFormPass('insuranceForm')">确 定</el-button>
+                                   @click="submitInversePass('insuranceInverseForm')">确 定</el-button>
                         <el-button type="info" size="small" class="sameWidthBtn"
-                                   @click="cancelInsuranceFormPass('insuranceForm')">取 消</el-button>
+                                   @click="cancelInversePass('insuranceInverseForm')">取 消</el-button>
                     </div>
                 </el-form>
             </div>
         </el-dialog>
-
-
-
         <el-dialog title="打卡管理功能设置确认" class="setSwitchScoped setMiddleDialog" :visible.sync="switchVisible" width="450px" :close-on-click-modal="false" center  :before-close="handleClose">
             <div>
                 <div>
@@ -375,14 +367,37 @@
                 <div>
                     该商家下所有状态为"待执行、已关闭"的排班将{{ punchManageMap[punchManageSwitch] }}打卡管理功能。
                 </div>
-                
                 <div class="flexHere">
                     <el-button type="primary" size="small" class="sameWidthBtn" @click="submitPunch">确 定</el-button>
                     <el-button type="info" size="small" class="sameWidthBtn" @click="cancelPunch">取 消</el-button>
                 </div>
             </div>
         </el-dialog>
-
+        <el-dialog title="打卡要求修改" class="setAuthScoped setMiddleDialog" :visible.sync="clockVisible" width="450px" :close-on-click-modal="false" center>
+            <div>
+                <el-form :model="clockForm" ref="clockForm"  label-width="10px" class="demo-ruleForm" :rules="clockRules">
+                    <div class="setAuthInnerHeight"  >
+                        <el-form-item label=""  prop="check">
+                            <el-checkbox-group v-model="clockForm.check">
+                                <template v-for="(item,index) in checkArray">
+                                    <div class="checkItemCon">
+                                        <el-checkbox :label="item.text" :key="item.value">{{item.text}}</el-checkbox>
+                                    </div>
+                                </template>
+                            </el-checkbox-group>
+                        </el-form-item>
+                    </div>
+                    <div class="flexHere">
+                        <el-button type="primary" size="small" :disabled="clockAble" class="sameWidthBtn"
+                                   @click="submitClockPass('clockForm')">确 定
+                        </el-button>
+                        <el-button type="info" size="small" class="sameWidthBtn"
+                                   @click="cancelClockPass('clockForm')">取 消
+                        </el-button>
+                    </div>
+                </el-form>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -441,6 +456,62 @@
                     }
                 }
             };
+            
+            var validateCopyTable = (rule, value, callback) => {
+                let index = +rule.field.slice(5,-5);
+                if( this.dynamicCopyAmoArray[index].able == 6 ){
+                    callback();
+                }
+                if( this.dynamicCopyAmoArray[index].able == 3 ){
+                    if( isNaN(this.dynamicCopyAmoArray[index].dynamicAmount) ){
+                        callback(new Error('保险单价不能为空'));
+                    }else{
+                        if( this.dynamicCopyAmoArray[index].multipleSelection.length ){
+                            if( isNaN(this.dynamicCopyAmoArray[index].dynamicAmount) ){
+                                callback(new Error('保险单价不能为空'));
+                            }else{
+                                callback();
+                            }
+                        }else{
+                            callback(new Error('您还未进行选择'));
+                        }
+                    }
+                }
+            };
+            
+            var validateCopyPlatPrice = (rule, value, callback) => {
+                if( this.insuranceInverseForm.radio1 == 3 ){
+                    if( (value == 0) || value ){
+                        if( isNaN( +value ) ){
+                            callback(new Error('请输入正确的金额数值'));
+                        }else{
+                            if( String(value).indexOf('.') > -1 ){
+                                let geneArr = String(value).split('.');
+                                let floatLength = geneArr[1].length;
+                                if(floatLength){                             
+                                    if( floatLength >= 2 ){
+                                        let fix = (Math.round(+value + 'e' + 2) / Math.pow(10, 2)).toFixed(2);
+                                        this.insuranceInverseForm.price = Math.abs(fix);
+                                    }else{
+                                        this.insuranceInverseForm.price = Math.abs(+value);
+                                    }
+                                }else{
+                                    this.insuranceInverseForm.price = Math.abs(+value);
+                                }
+                            }else{
+                                this.insuranceInverseForm.price = Math.abs(+value);
+                            }
+                            callback();
+                        }
+                    }else{
+                        callback(new Error('平台使用费不能为空'));
+                    }                    
+                }else{
+                    callback();
+                }
+            };
+            
+            
             var validateComPrice = (rule, value, callback) => {
                 if( this.commissionForm.radio1 == 3 ){
                     if( (value == 0) || value){
@@ -480,7 +551,7 @@
                     {des: '系统使用费', index: 2,description:'每人每次开工打卡扣除系统使用费，当天排班扣1天系统使用费，跨天排班扣2天使用费，同一用户同一商家下同一天不重复扣费'  },  
                 ],
                 tableData23: [
-                    {des: '系统使用费', index: 2,description:'每人每次开工打卡扣除系统使用费，当天排班扣1天系统使用费，跨天排班扣2天使用费，同一用户同一商家下同一天不重复扣费'  },  
+                    {des: '系统使用费', index: 2,description:'每人每次扣费时间扣除系统使用费，则扣除系统使用费，当天排班扣1天系统使用费，跨天排班扣2天使用费，同一用户同一商家下同一天不重复扣费'  },  
                 ],
                 emptyTalentText:'不启用',
                 thirdConfirmText:'不启用',
@@ -489,6 +560,20 @@
                     radio1: 6,
                     radio2: 6, 
                 },
+                checkArray:[
+                    {value:1,text:'半点打卡'},
+                    {value:2,text:'不打卡'},
+                ],
+                checkList:[],
+                clockForm:{
+                    check:[],
+                },
+                clockRules:{
+                    check:[
+                        { required: true, message: '打卡要求不能为空',trigger: 'blur' },
+                    ]
+                },
+                clockAble:false,
                 commissionVisible: false,
                 commissionForm: {
                     radio1: 3,
@@ -512,14 +597,13 @@
                 },
                 insuranceInverseRules: {
                     price:[
-                        { validator: validatePlatPrice, trigger: 'blur' },
-                    ],
+                        { validator: validateCopyPlatPrice, trigger: 'blur' },
+                    ],                    
                     check0Table:[
-                        { validator: validateTable, trigger: 'blur' },
-                    ]
+                        { validator: validateCopyTable, trigger: 'blur' },
+                    ],
                 },
-                
-                
+                clockVisible:false,
                 insuranceVisible: false,                  
                 insuranceForm: {
                     radio1: 3,
@@ -539,8 +623,11 @@
                 },
                 currentPage:1,
                 insuranceTotal:0,
+                insuranceCopyTotal:0,
                 multipleSelection:[],
                 tableDataDialog:[],
+                tableDataCopyDialog:[],
+                dynamicCopyAmoArray:[],
                 dynamicAmoArray:[
                     { 
                         dynamicAmount:0,
@@ -550,16 +637,7 @@
                         multipleSelection:[],
                         tableDataDialog:[],
                         currentPage:1,
-                    },
-                    { 
-                        dynamicAmount:0,
-                        name:'雷电',
-                        attributeId:4,
-                        able:6,
-                        multipleSelection:[],
-                        tableDataDialog:[],
-                        currentPage:1,
-                    },
+                    }
                 ],
                 dynamicAmount:0,
                 showInsurancePag:false,
@@ -568,6 +646,8 @@
                 attributeList:[],
                 trackIndex:0,
                 bridgeFinal:{},
+                rowCopyBridge:{},
+                bridgeCopyFinal:{},
                 companyName:'',
                 tempStatus:'0',
                 switchVisible:false,
@@ -580,9 +660,143 @@
         },
         mounted(){
             this.checkOwnAttribute();
-            this.fetchParent();            
+            this.fetchParent();   
         },
         methods: {
+            insuranceCopyAction(){                
+                let noArrSelection = [];
+                this.dynamicCopyAmoArray.forEach((ele,index)=>{
+                    if( ele.able == 3 ){
+                        this.dynamicCopyAmoArray[index].multipleSelection.forEach(subEle=>{
+                            noArrSelection.push({
+                                cusId:this.$route.query.id,
+                                feeType:1,
+                                insuId:subEle.id,
+                                amount:subEle.amount,
+                                attributeId:ele.attributeId,
+                                attributeName:ele.name,
+                                punchType:2,
+                            });
+                        });
+                    }
+                    if( ele.able == 6 ){
+                    }
+                });
+                noArrSelection = noArrSelection.concat({
+                    cusId:this.$route.query.id,
+                    feeType:2,
+                    insuId:0,
+                    amount:this.insuranceInverseForm.price,
+                    punchType:2,
+                });
+                let temp = this.dynamicCopyAmoArray.map(ele=>{
+                    return +ele.dynamicAmount
+                });
+                let calc = temp.reduce((accumulator,currentValue)=>{
+                    return accumulator + currentValue;
+                },0);           
+                let fix = (Math.round(+calc + 'e' + 2) / Math.pow(10, 2)).toFixed(2);  
+                
+                this.ApiLists.businessCusystemFee(noArrSelection).then(res=>{
+                    let { respCode } = res;
+                    if( respCode == 0 ){
+                        let data = {
+                            id:this.rowCopyBridge.id,
+                            feeAmount: fix,
+                            feeStatus:this.insuranceInverseForm.radio1 == 3 ? 1 : 0,
+                            feeEmp:this.insuranceInverseForm.radio1 == 6 ? this.rowCopyBridge.feeEmp : this.insuranceInverseForm.radio2%2,
+                        };
+                        this.ApiLists.businessCustomerSettingSave(data).then(res=>{
+                            let { respCode } = res;
+                            if( respCode === 0 ){
+                                this.$message({
+                                    message: '设置成功',
+                                    type: 'success'
+                                });
+                                this.insuranceInverseVisible = false;
+                                this.getConfigInfo();
+                            }
+                        }).catch(err=>{
+                            console.log('err',err);
+                        }) 
+                    }
+                }).catch(err=>{
+                    console.log('err',err);
+                })
+            },
+            submitInversePass(formName){
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        console.log('submit!');
+                        this.insuranceCopyAction();
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            cancelInversePass(formName){
+                this.$refs[formName].resetFields();
+                this.insuranceInverseVisible = false;
+            },
+            handleClose2(done){
+                this.$refs['insuranceInverseForm'].resetFields();
+                done();
+            },
+            popEditArray(){
+                this.clockVisible = true;
+            },
+            clockAction(){
+                if( this.clockForm.check.length ){
+                    let container = [];
+                    this.clockForm.check.forEach(ele=>{
+                        let find = this.checkArray.find(subEle=>{
+                           return  subEle.text == ele;
+                        });
+                        container.push( find.value );
+                    })
+                    let finalStr = container.join(',');
+                    let params = {
+                        cusId:this.$route.query.id,
+                        punchType:finalStr,
+                    };   
+                    this.clockAble = true;
+                    this.ApiLists.setPunchType(params).then(res=>{
+                        let { respCode } = res;
+                        if( respCode === 0 ){
+                            this.$message({
+                                message: '设置成功',
+                                type: 'success'
+                            });
+                            this.clockVisible = false;
+                            this.checkOwnAttribute();
+                            this.fetchParent();   
+                        }else{
+                        }
+                    }).catch(err=>{
+                        console.log('err',err);
+                    }).finally(()=>{
+                        setTimeout(()=>{
+                            this.clockAble = false;
+                        },500)
+                    })  
+                }
+            },
+            submitClockPass(formName){
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        console.log('submit!');
+                        this.clockAction();
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            cancelClockPass(formName){
+                this.$refs[formName].resetFields();
+                this.clockVisible = false;
+            },            
             handleClose(done){
                 this.punchManageSwitch = this.tempStatus;
                 done();
@@ -648,6 +862,11 @@
                         this.dynamicAmoArray.forEach((ele,index)=>{
                             this.insuranceRules['check'+index+'Table'] = [sourceValidate];
                         });
+                        this.dynamicCopyAmoArray = map1;
+                        let sourceValidate2 = Object.assign({},this.insuranceInverseRules.check0Table[0]);
+                        this.dynamicCopyAmoArray.forEach((ele,index)=>{
+                            this.insuranceInverseRules['check'+index+'Table'] = [sourceValidate2];
+                        });
                     }
                 }).catch(err=>{
                     console.log('err',err);
@@ -704,6 +923,9 @@
                     console.log('err',err);
                 })
             },
+            changeHere(){
+                console.log( this.checkList );
+            },
             fetchParent(){
                 let params = {
                     id:this.$route.query.id
@@ -713,6 +935,21 @@
                     if( respCode === 0 ){
                         let parentData = data;
                         this.companyName = parentData.name;   
+                        let punchTypeArray = [];
+                        if(parentData.punchType){
+                            let arr1 = parentData.punchType.split(',');
+                            arr1.forEach(ele=>{
+                                let find = this.checkArray.find(subEle=>{
+                                   return  subEle.value == ele;
+                                });
+                                punchTypeArray.push(find);
+                            })
+                        }
+                        let arr2 = punchTypeArray.map(ele=>{
+                            return ele.text;
+                        })
+                        this.checkList = arr2;
+                        this.clockForm.check = arr2;
                         this.punchManageSwitch = String(parentData.punchTimeManageSwitch);
                         if( parentData.emptyTalentSwitch == 0 ){
                             this.authForm.radio1 = 6;
@@ -757,6 +994,7 @@
                                 amount:subEle.amount,
                                 attributeId:ele.attributeId,
                                 attributeName:ele.name,
+                                punchType:1,
                             });
                         });
                     }
@@ -767,7 +1005,8 @@
                     cusId:this.$route.query.id,
                     feeType:2,
                     insuId:0,
-                    amount:this.insuranceForm.price
+                    amount:this.insuranceForm.price,
+                    punchType:1,
                 });
 //                console.log( noArrSelection );
                 let temp = this.dynamicAmoArray.map(ele=>{
@@ -872,6 +1111,101 @@
             },
             setPopSp(scope){
                 this.insuranceInverseVisible = true;
+                this.$nextTick(()=>{
+                    this.$refs.insuranceInverseForm.resetFields();
+                    this.insuranceInverseForm.radio1 = scope.feeStatus ? 3 : 6;
+                    this.insuranceInverseForm.radio2 = scope.feeEmp ? 3 : 6; 
+                    if( scope.systemFeeDetailVOList&&scope.systemFeeDetailVOList.length ){
+                        let platItem = scope.systemFeeDetailVOList.find(ele=>{
+                            return ele.feeType == 2;
+                        })
+                        if( platItem ){
+                            this.insuranceInverseForm.price = platItem.amount;  
+                        }else{
+                            this.insuranceInverseForm.price = 1;
+                        }   
+                        let listTrack = scope.systemFeeDetailVOList.filter(ele=>{
+                            return ele.insuId != 0;
+                        })   
+                        this.bridgeCopyFinal = {};
+                        if( listTrack&&listTrack.length ){
+                            this.bridgeCopyFinal =  listTrack.reduce((acc,cur)=>{
+                                var key = cur['attributeId'];
+                                if (!acc[key]) {
+                                    acc[key] = [];
+                                }
+                                acc[key].push(cur);
+                                return acc;
+                            },{})    
+                            this.dynamicCopyAmoArray.forEach((ele,index)=>{
+                                this.reCopyCalc(index);
+                            })
+                        }else{  
+                            this.dynamicCopyAmoArray.forEach((ele,index)=>{
+                                ele.able = 6;
+                                ele.dynamicAmount = this.insuranceInverseForm.price;
+                                this.reCopyCalc(index);
+                            })
+                            }
+                        }else{
+                        }     
+                    })  
+                        let params = {
+                            status:1,
+                            pageNum:this.dynamicCopyAmoArray.length && this.dynamicCopyAmoArray[0].currentPage || 1,
+                            pageSize:50,
+                        };       
+                        this.ApiLists.getInsuList(params).then(res=>{
+                            let { respCode,data } = res;
+                            if( respCode === 0 ){
+                                if( data&&data.list ){
+                                    data.list.forEach(ele=>{
+                                        ele.amount = 1;  
+                                    });
+                                    let deep1 = JSON.parse( JSON.stringify(data.list) );
+                                    this.dynamicCopyAmoArray.forEach((ele,index)=>{
+                                        ele.tableDataDialog =  JSON.parse( JSON.stringify(data.list) );
+                                    }) 
+                                    this.insuranceCopyTotal = data.total;
+                                    if( data.total > 50){
+                                        this.show2InsurancePag = true;
+                                    }else{
+                                        this.show2InsurancePag = false;
+                                    }
+                                    this.$nextTick(()=>{
+                                        if( Object.keys(this.bridgeCopyFinal) && Object.keys(this.bridgeCopyFinal).length ){
+                                            Object.keys(this.bridgeCopyFinal).forEach(ele=>{
+                                                let track = this.dynamicCopyAmoArray.find(subEle=>{
+                                                    return subEle.attributeId == ele;
+                                                })
+                                                let trackIndex = this.dynamicCopyAmoArray.findIndex(subEle=>{
+                                                    return subEle.attributeId == ele;
+                                                })
+                                                this.dynamicCopyAmoArray[trackIndex].able = 3;
+                                                this.dynamicCopyAmoArray[trackIndex].tableDataDialog.forEach((third,thirdIndex)=>{
+                                                   let findddd = this.bridgeCopyFinal[ele].findIndex(four=>{
+                                                        return four.insuId == third.id ;
+                                                    })
+                                                    if(findddd > -1){
+                                                        let nextObj = this.dynamicCopyAmoArray[trackIndex].tableDataDialog[thirdIndex];
+                                                        this.$refs['multipleCopy'+trackIndex+'Table'][0].toggleRowSelection( nextObj );
+                                                        this.dynamicCopyAmoArray[trackIndex].tableDataDialog[thirdIndex].amount = this.bridgeCopyFinal[ele][findddd].amount;
+                                                    }
+                                                })
+                                            });
+                                        }
+                                    });                                    
+                                }else{
+                                    this.tableDataCopyDialog = [];
+                                    this.insuranceCopyTotal = 0;
+                                    this.show2InsurancePag = false;
+                                }
+                            }else{
+                            }
+                        }).catch(err=>{
+                            console.log('err',err);
+                        })
+                        this.rowCopyBridge = scope;
             },
             setPop(scope) {
                 switch (scope.index) {
@@ -985,6 +1319,11 @@
                         break;
                 }
             },
+            
+            handleSelectionCopyChange(val,index){
+                this.dynamicCopyAmoArray[index].multipleSelection = val;
+                this.reCopyCalc(index);
+            },
             handleSelectionChange(val,index){
                 this.dynamicAmoArray[index].multipleSelection = val;
                 this.reCalc(index);
@@ -994,9 +1333,26 @@
                     this.reCalc(index);
                 })
             },
+            priceCopyChange(){
+                this.dynamicCopyAmoArray.forEach((ele,index)=>{
+                    this.reCopyCalc(index);
+                })
+            },
+            tableItemCopyChange(value,index){
+                this.$forceUpdate();
+                this.reCopyCalc(index);
+            },
             tableItemChange(value,index){
                 this.$forceUpdate();
                 this.reCalc(index);
+            },
+            ableCopyChange(index,able){
+                if( able == 6 ){
+                    this.dynamicCopyAmoArray[index].multipleSelection = [];
+                    this.$refs[ 'multipleCopy'+index+'Table' ][0].clearSelection();
+                }
+                this.$forceUpdate();
+                this.reCopyCalc(index);
             },
             ableChange(index,able){
                 if( able == 6 ){
@@ -1005,6 +1361,23 @@
                 }
                 this.$forceUpdate();
                 this.reCalc(index);
+            },
+            reCopyCalc(index){
+                this.$nextTick(()=>{
+                    let temp = this.dynamicCopyAmoArray[index].multipleSelection.map(ele=>{
+                        return ele.amount
+                    });
+                    let calc = temp.reduce((accumulator,currentValue)=>{
+                        return accumulator + +(currentValue);
+                    },0)    
+                    let fix = (Math.round(+calc + 'e' + 2) / Math.pow(10, 2)).toFixed(2);
+                    if( isNaN( +this.insuranceInverseForm.price ) ){
+                        this.dynamicCopyAmoArray[index].dynamicAmount = fix;
+                    }else{
+                        let bridge = +this.insuranceInverseForm.price + +fix;
+                        this.dynamicCopyAmoArray[index].dynamicAmount = (Math.round(+bridge + 'e' + 2) / Math.pow(10, 2)).toFixed(2)
+                    }
+                });
             },
             reCalc(index){
                 this.$nextTick(()=>{
@@ -1032,6 +1405,7 @@
                 };
                 this.ApiLists.businessCustomerFeeLists(params).then(res=>{
                     let { data,respCode } = res;
+                    let data1 = data;
                     if( respCode === 0 ){
                         let item1 = data.find(ele=>{
                             return ele.feeType == 1;
@@ -1039,7 +1413,172 @@
                         let item2 = data.find(ele=>{
                             return ele.feeType == 2;
                         });
-                        this.tableData21 = [
+                        let item3 = data.find(ele=>{
+                            return ele.feeType == 2;
+                        });
+                        let params = {
+                            cusId:this.$route.query.id,
+                            punchType:1,
+                            feeType:2
+                        };   
+                         this.ApiLists.feeSettingDetail(params).then(res=>{
+                            let { respCode,data } = res;
+                            if( respCode === 0 ){
+                                item2 = data1.find(ele=>{
+                                    return ele.id == data.id;
+                                });
+                                this.tableData22 = [
+                                    {
+                                        des: '系统使用费', 
+                                        index: 2,description:'每人每次开工打卡扣除系统使用费，当天排班扣1天系统使用费，跨天排班扣2天使用费，同一用户同一商家下同一天不重复扣费',
+                                        feeAmount: item2&&item2.feeAmount ? item2.feeAmount:'',
+                                        feeStatus: item2&&item2.feeStatus ? item2.feeStatus:0,
+                                        feeEmp: item2&&item2.feeEmp ? item2.feeEmp : 0,
+                                        id:item2&&item2.id ? item2.id : '',
+                                        systemFeeDetailVOList:item2&&item2.systemFeeDetailVOList ? item2.systemFeeDetailVOList : [],
+                                        forDisplay:[],
+                                    },
+                                ];                                  
+                                let trackItem = this.tableData22.find(ele=>{
+                                    return ele.index == 2
+                                })    
+                                let trackItem2 = trackItem.systemFeeDetailVOList.find(ele=>{
+                                    return ele.feeType == 2
+                                })
+                                let listTrack = trackItem.systemFeeDetailVOList.filter(ele=>{
+                                    return ele.insuId != 0;
+                                })                                  
+                                let flag1 = listTrack.reduce((acc,cur)=>{
+                                    var key = cur['attributeId'];
+                                    if (!acc[key]) {
+                                        acc[key] = [];
+                                    }
+                                    acc[key].push(cur);
+                                    return acc;
+                                },{})                                  
+                                let bridge = 0;
+                                let blockArr1 = [];
+                                if( Object.keys(flag1) && Object.keys(flag1).length ){
+                                    Object.keys(flag1).forEach(ele=>{
+                                        let calc = flag1[ele].reduce((accumulator,currentValue)=>{
+                                            return accumulator + +(currentValue.amount);
+                                        },0)  
+                                        let fix = (Math.round(+calc + 'e' + 2) / Math.pow(10, 2)).toFixed(2);
+                                        bridge = +fix;    
+                                        blockArr1.push({
+                                            amount:+fix,
+                                            attributeId:ele,
+                                            attributeName:flag1[ele].length ? flag1[ele][0].attributeName : '',
+                                        });
+                                    })
+                                }
+                                let blockArr2 = [];
+                                this.dynamicAmoArray.map((ele)=>{
+                                    let track = blockArr1.find(subEle=>{
+                                        return subEle.attributeId == ele.attributeId
+                                    })
+                                    if( track ){
+                                        blockArr2.push(track);
+                                    }else{
+                                        blockArr2.push({
+                                            amount:+trackItem2.amount,
+                                            attributeName:ele.name
+                                        });
+                                    }
+                                })
+                                blockArr2.forEach(ele=>{
+                                    if( ele.attributeId ){
+                                        ele.amount = +(Math.round(+ele.amount + trackItem2.amount + 'e' + 2) / Math.pow(10, 2)).toFixed(2) 
+                                    }
+                                })
+                                trackItem.forDisplay = blockArr2;
+                            }else{
+                            }
+                        }).catch(err=>{
+                            console.log('err',err);
+                        })                           
+                         let params2 = {
+                            cusId:this.$route.query.id,
+                            punchType:2,
+                            feeType:2
+                        };   
+                         this.ApiLists.feeSettingDetail(params2).then(res=>{
+                            let { respCode,data } = res;
+                            if( respCode === 0 ){
+                                item3 = data1.find(ele=>{
+                                    return ele.id == data.id;
+                                });
+                                this.tableData23 = [
+                                    {
+                                        des: '系统使用费', 
+                                        description:'每人每次扣费时间扣除系统使用费，则扣除系统使用费，当天排班扣1天系统使用费，跨天排班扣2天使用费，同一用户同一商家下同一天不重复扣费',
+                                        feeAmount: item3&&item3.feeAmount ? item3.feeAmount:'',
+                                        feeStatus: item3&&item3.feeStatus ? item3.feeStatus:0,
+                                        feeEmp: item3&&item3.feeEmp ? item3.feeEmp : 0,
+                                        id:item3&&item3.id ? item3.id : '',
+                                        systemFeeDetailVOList:item3&&item3.systemFeeDetailVOList ? item3.systemFeeDetailVOList : [],
+                                        forDisplay:[],
+                                        time:data.createdAt
+                                    },
+                                ];
+                                
+                                let trackItem = this.tableData23[0];
+                                let trackItem2 = trackItem.systemFeeDetailVOList.find(ele=>{
+                                    return ele.feeType == 2
+                                });
+                                let listTrack = trackItem.systemFeeDetailVOList.filter(ele=>{
+                                    return ele.insuId != 0;
+                                })  
+                                let flag1 = listTrack.reduce((acc,cur)=>{
+                                    var key = cur['attributeId'];
+                                    if (!acc[key]) {
+                                        acc[key] = [];
+                                    }
+                                    acc[key].push(cur);
+                                    return acc;
+                                },{})  
+                                let bridge = 0;
+                                let blockArr1 = [];
+                                if( Object.keys(flag1) && Object.keys(flag1).length ){
+                                    Object.keys(flag1).forEach(ele=>{
+                                        let calc = flag1[ele].reduce((accumulator,currentValue)=>{
+                                            return accumulator + +(currentValue.amount);
+                                        },0)  
+                                        let fix = (Math.round(+calc + 'e' + 2) / Math.pow(10, 2)).toFixed(2);
+                                        bridge = +fix;    
+                                        blockArr1.push({
+                                            amount:+fix,
+                                            attributeId:ele,
+                                            attributeName:flag1[ele].length ? flag1[ele][0].attributeName : '',
+                                        });
+                                    })
+                                }
+                                let blockArr2 = [];
+                                this.dynamicAmoArray.map((ele)=>{
+                                    let track = blockArr1.find(subEle=>{
+                                        return subEle.attributeId == ele.attributeId
+                                    })
+                                    if( track ){
+                                        blockArr2.push(track);
+                                    }else{
+                                        blockArr2.push({
+                                            amount:+trackItem2.amount,
+                                            attributeName:ele.name
+                                        });
+                                    }
+                                })
+                                blockArr2.forEach(ele=>{
+                                    if( ele.attributeId ){
+                                        ele.amount = +(Math.round(+ele.amount + trackItem2.amount + 'e' + 2) / Math.pow(10, 2)).toFixed(2) 
+                                    }
+                                })
+                                trackItem.forDisplay = blockArr2;
+                            }else{
+                            }
+                        }).catch(err=>{
+                            console.log('err',err);
+                        })
+                         this.tableData21 = [
                             {
                                 des: '付款手续费', 
                                 index: 1,description:'每次付款 每个用户每笔费用付款',
@@ -1048,72 +1587,7 @@
                                 feeEmp: item1&&item1.feeEmp ? item1.feeEmp : 0,
                                 id:item1&&item1.id ? item1.id : '',
                             },
-                        ];                         
-                        this.tableData22 = [
-                            {
-                                des: '系统使用费', 
-                                index: 2,description:'每人每次开工打卡扣除系统使用费，当天排班扣1天系统使用费，跨天排班扣2天使用费，同一用户同一商家下同一天不重复扣费',
-                                feeAmount: item2&&item2.feeAmount ? item2.feeAmount:'',
-                                feeStatus: item2&&item2.feeStatus ? item2.feeStatus:0,
-                                feeEmp: item2&&item2.feeEmp ? item2.feeEmp : 0,
-                                id:item2&&item2.id ? item2.id : '',
-                                systemFeeDetailVOList:item2&&item2.systemFeeDetailVOList ? item2.systemFeeDetailVOList : [],
-                                forDisplay:[],
-                            },
-                        ];                        
-                        let trackItem = this.tableData22.find(ele=>{
-                            return ele.index == 2
-                        })                         
-                        let trackItem2 = trackItem.systemFeeDetailVOList.find(ele=>{
-                            return ele.feeType == 2
-                        })
-                        let listTrack = trackItem.systemFeeDetailVOList.filter(ele=>{
-                            return ele.insuId != 0;
-                        })  
-                        let flag1 = listTrack.reduce((acc,cur)=>{
-                            var key = cur['attributeId'];
-                            if (!acc[key]) {
-                                acc[key] = [];
-                            }
-                            acc[key].push(cur);
-                            return acc;
-                        },{})  
-                        let bridge = 0;
-                        let blockArr1 = [];
-                        if( Object.keys(flag1) && Object.keys(flag1).length ){
-                            Object.keys(flag1).forEach(ele=>{
-                                let calc = flag1[ele].reduce((accumulator,currentValue)=>{
-                                    return accumulator + +(currentValue.amount);
-                                },0)  
-                                let fix = (Math.round(+calc + 'e' + 2) / Math.pow(10, 2)).toFixed(2);
-                                bridge = +fix;    
-                                blockArr1.push({
-                                    amount:+fix,
-                                    attributeId:ele,
-                                    attributeName:flag1[ele].length ? flag1[ele][0].attributeName : '',
-                                });
-                            })
-                        }
-                        let blockArr2 = [];
-                        this.dynamicAmoArray.map((ele)=>{
-                            let track = blockArr1.find(subEle=>{
-                                return subEle.attributeId == ele.attributeId
-                            })
-                            if( track ){
-                                blockArr2.push(track);
-                            }else{
-                                blockArr2.push({
-                                    amount:+trackItem2.amount,
-                                    attributeName:ele.name
-                                });
-                            }
-                        })
-                        blockArr2.forEach(ele=>{
-                            if( ele.attributeId ){
-                                ele.amount = +(Math.round(+ele.amount + trackItem2.amount + 'e' + 2) / Math.pow(10, 2)).toFixed(2) 
-                            }
-                        })
-                        trackItem.forDisplay = blockArr2;
+                        ];                          
                     }
                 }).catch(err=>{
                     console.log('err',err);
@@ -1185,9 +1659,9 @@
             justify-content: flex-start;
             align-content: center;
             align-items: center;
-            .setMargina {
-                margin-right: 100px;
-            }
+        }
+        .setMargina {
+            margin-right: 100px;
         }
         .radioTitle {
             color: #606266;
@@ -1198,7 +1672,12 @@
             margin-right: 10px;
         }
         .setAuthInnerHeight {
-            height: 120px;
+            height: 140px;
+        }
+        .checkItemCon {
+            padding-left: 100px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
         }
         .inputInnerFlex {
             display: flex;
@@ -1228,7 +1707,7 @@
 <style lang="scss">
     .configInnerCon {
         .setAuthScoped  .el-dialog {
-            height: 270px;
+            height: 300px;
         }
         .setRootScoped .el-dialog {
             height: 370px;

@@ -425,7 +425,6 @@ export default {
         handleAvatarScucess(res, file) {
             const key = res.key;
             this.imgForUpload = `http://${this.bucketHost}/${key}`;
-            console.log( this.imgForUpload );            
             this.$refs.companyForm.validateField('imgUpload');            
             this.getToken()
         },
