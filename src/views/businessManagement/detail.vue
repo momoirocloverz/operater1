@@ -73,8 +73,9 @@
           </div>
         </div>
         <div v-if="activeName =='second'">
-            <Config />
-          </div>
+          <Config v-if="mainType == '2'" />
+          <Record :userId="data.id" v-if="mainType == '1'"></Record>
+        </div>
           <Role :id="nextData.id" v-if="activeName =='third'"> </Role>
           <div v-if="activeName =='fourth'">
             <div>
@@ -280,11 +281,20 @@ import Account from './sub/account.vue'
 import Attr from './components/attribute'
 import SkillTag from './components/skillTag'
 import Function from './sub/function.vue'
+import Record from './components/record';
 
 export default {
   name: 'businessDetail',
-  components: { Role, Attr, CropInfo, Account, SkillTag, Config,Function },
+  components: { Role, Attr, CropInfo, Account, SkillTag, Config,Function,Record },
   data() {
+    var validatePass = (rule, value, callback) => {
+      if( !this.companyForm.province  ||  !this.companyForm.region || !this.companyForm.city){
+        callback(new Error('省、市、区 请填写完整'));
+      }else{
+          callback();
+      }
+      
+    }
     var validateImg = (rule, value, callback) => {
       let flag1 = this.companyForm.businessLicense
       if (!flag1) {
@@ -295,6 +305,7 @@ export default {
     }
     return {
       user: '',
+      data: '', // router 参数
       freezeVisible: false,
       Upgradecompany: false, // 个人升级企业 弹出层控制
       loading: true,
@@ -382,12 +393,21 @@ export default {
             trigger: ['blur', 'change'],
           },
         ],
+        trinity: [
+          { validator: validatePass, trigger: ['blur', 'change'],}
+        ],
+        businessLicense: [
+          { required: true, message: '营业执照不能为空', trigger: 'blur' },
+        ],
         address: [
           { required: true, message: '请输入详细地址', trigger: 'blur' },
         ],
         imgUpload: [{ validator: validateImg, trigger: 'change' }],
       },
     }
+  },
+  created(){
+    this.data = this.$route.query
   },
   mounted() {
     this.getwatermark() // 水印地址
@@ -399,21 +419,12 @@ export default {
     // 升级公司表单控制方法
     Company() {
       this.Upgradecompany = true
-      this.nestAreaRequest();
       this.fileList = [];
       this.imgForUpload = '';
+      this.getProvince()
       this.getToken();
       this.$nextTick(()=>{
           this.$refs.companyForm.resetFields();
-      });
-    },
-    nestAreaRequest(){
-      this.getProvince();
-      this.$nextTick(()=>{
-          this.getCity();
-          this.$nextTick(()=>{
-              this.getRegion();
-          });
       });
     },
     // 触发
@@ -427,29 +438,28 @@ export default {
       this.getRegion();
       this.companyForm.region = '';
     },
-
     // 获取省
-    getProvince() {
+    async getProvince() {
         let params = {
             code:'city',
             value:'0',
         };
-        this.ApiLists.getDicList(params).then(res=>{
-            let { data,respCode } = res;
-            if( respCode === 0 ){
-                this.provinceList = data;
-            }
-        }).catch(err=>{
-            console.log('err',err);
-        })
+        await this.ApiLists.getDicList(params).then(res=>{
+              let { data,respCode } = res;
+              if( respCode === 0 ){
+                  this.provinceList = data;
+              }
+          }).catch(err=>{
+              console.log('err',err);
+          })
     },
     // 获取城市
-    getCity() {
+    async getCity() {
       let params = {
           code:'city',
           value:this.companyForm.province,
       };
-      this.ApiLists.getDicList(params).then(res=>{
+      await this.ApiLists.getDicList(params).then(res=>{
           let { data,respCode } = res;
           if( respCode === 0 ){
               this.cityList = data;
@@ -459,12 +469,12 @@ export default {
       })
     },
     // 区域联动县
-    getRegion() {
+    async getRegion() {
       let params = {
           code:'city',
           value:this.companyForm.city,
       };
-      this.ApiLists.getDicList(params).then(res=>{
+      await this.ApiLists.getDicList(params).then(res=>{
           let { data,respCode } = res;
           if( respCode === 0 ){
               this.regionList = data;
@@ -520,22 +530,34 @@ export default {
           let cityObj = this.cityList.find(ele=>{
               return ele.dicVal == this.companyForm.city;
           });
-          this.companyForm.userId = this.user.userId
-          this.companyForm.mobile = this.user.mobile
-          this.companyForm.realName = this.user.realName
-          this.companyForm.idCard = this.user.idCard
-          this.companyForm.province = provinceObj.dicName
-          this.companyForm.city = cityObj.dicName
-          this.ApiLists.personaLupgrade(this.companyForm).then(res => {
+          // let regionObj = this.cityList.find(ele=>{
+          //     return ele.dicVal == this.companyForm.region;
+          // });
+          let data = {
+            userId : this.user.userId,
+            type : this.companyForm.type,
+            mobile : this.user.mobile,
+            realName : this.user.realName,
+            idCard : this.user.idCard,
+            name: this.companyForm.name,
+            shortName: this.companyForm.shortName,
+            creditCode: this.companyForm.creditCode,
+            legalPerson: this.companyForm.legalPerson,
+            Industry: this.companyForm.Industry,
+            province : provinceObj.dicName,
+            city : cityObj.dicName,
+            region: this.companyForm.region,
+            address: this.companyForm.address,
+            businessLicense: this.companyForm.businessLicense,
+            
+          }
+          this.ApiLists.personaLupgrade(data).then(res => {
             let { respCode } = res;
             if(respCode === 0){
               this.Upgradecompany = false
               this.$message({
                 message: '升级成功',
                 type: 'success'
-              });
-              this.$router.push({
-                path:'/main/businessList'
               });
             }
           }).catch(err => {
@@ -737,6 +759,12 @@ export default {
             empty.push({
               title: '商家信息',
               name: 'first',
+            })
+          }
+          if (this.AuthBoolean('23')) {
+            empty.push({
+              title: '操作记录',
+              name: 'second',
             })
           }
           this.restTabArr = empty

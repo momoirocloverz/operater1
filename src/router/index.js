@@ -4,6 +4,7 @@ import login from '../views/login.vue';
 import empty from '@/views/empty.vue';
 import NotFoundComponent from '@/views/404.vue';
 import stableHeader from '@/views/stableHeader.vue';
+import store from '../store/index.js'
 
 Vue.use(VueRouter)
 
@@ -25,6 +26,13 @@ const routes = [
                 component: function () {
                     return import(/* webpackChunkName: "main" */ '../views/welcome.vue')
                 },
+                beforeEnter: (to, from, next) => {
+                    store.commit('changeMenuActiveIndex', '0');
+                    store.commit('setBreadcrumbList',[
+                        { title:'首页' }
+                    ]);
+                    next();
+                }
             },
             {
                 path: 'dataList',
@@ -32,12 +40,28 @@ const routes = [
                 component: function () {
                     return import(/* webpackChunkName: "businessList" */ '../views/dataList/list.vue')
                 },
+                beforeEnter: (to, from, next) => {
+                    store.commit('changeMenuActiveIndex', '0-1');
+                    store.commit('setBreadcrumbList',[
+                        { title:'数据管理' },
+                        { title:'基础数据' },
+                    ]);
+                    next();
+                }
             }, {
                 path: 'businessList',
                 name: 'businessList',
                 component: function () {
                     return import(/* webpackChunkName: "businessList" */ '../views/businessManagement/list.vue')
                 },
+                beforeEnter: (to, from, next) => {
+                    store.commit('changeMenuActiveIndex', '1-1');
+                    store.commit('setBreadcrumbList',[
+                        { title:'商家管理' },
+                        { title:'商家列表' },
+                    ]);
+                    next();
+                }
             },
             {
                 path: 'userList',
@@ -45,6 +69,14 @@ const routes = [
                 component: function () {
                     return import(/* webpackChunkName: "userList" */ '../views/userManagement/list.vue')
                 },
+                beforeEnter: (to, from, next) => {
+                    store.commit('changeMenuActiveIndex', '2-1');
+                    store.commit('setBreadcrumbList',[
+                        { title:'用户管理' },
+                        { title:'用户列表' },
+                    ]);
+                    next();
+                }
             },
             {
                 path: 'administrative',
@@ -56,6 +88,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "administrative" */ '../views/administrativeExpenses/normalList.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '3-1');
+                            store.commit('setBreadcrumbList',[
+                                { title:'管理费账户管理' },
+                                { title:'商家账户列表' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'wancaiList',
@@ -83,6 +123,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "taskManagement" */ '../views/taskManagement/taskList.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '5-1');
+                            store.commit('setBreadcrumbList',[
+                                { title:'任务排班管理' },
+                                { title:'任务列表' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'taskManaClasslist',
@@ -90,6 +138,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "taskManagement" */ '../views/taskManagement/classList.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '5-2');
+                            store.commit('setBreadcrumbList',[
+                                { title:'任务排班管理' },
+                                { title:'排班列表' },
+                            ]);
+                            next();
+                        }
                     },
                 ]
             },
@@ -103,6 +159,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "InsuranceMana" */ '../views/InsuranceManagement/list.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '6-1');
+                            store.commit('setBreadcrumbList',[
+                                { title:'保单管理' },
+                                { title:'保险列表' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'recordList',
@@ -123,6 +187,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "productMana" */ '../views/productManagement/paramList.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '7-1');
+                            store.commit('setBreadcrumbList',[
+                                { title:'产品管理' },
+                                { title:'系统参数设置' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'itemList',
@@ -130,6 +202,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "productMana" */ '../views/productManagement/itemList.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '7-2');
+                            store.commit('setBreadcrumbList',[
+                                { title:'产品管理' },
+                                { title:'类目管理' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'versionList',
@@ -137,6 +217,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "productMana" */ '../views/productManagement/versionList.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '7-3');
+                            store.commit('setBreadcrumbList',[
+                                { title:'产品管理' },
+                                { title:'版本管理' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'insurList',
@@ -144,6 +232,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "productMana" */ '../views/productManagement/insuranceList.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '7-4');
+                            store.commit('setBreadcrumbList',[
+                                { title:'产品管理' },
+                                { title:'保险管理' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'productHelper',
@@ -151,6 +247,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "productMana" */ '../views/productManagement/helperMaster/list.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '7-5');
+                            store.commit('setBreadcrumbList',[
+                                { title:'产品管理' },
+                                { title:'企业版帮助中心' },
+                            ]);
+                            next();
+                        }
                     },
                 ]
             },
@@ -164,6 +268,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "systemMana" */ '../views/systemManagement/userList.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '8-1');
+                            store.commit('setBreadcrumbList',[
+                                { title:'系统管理' },
+                                { title:'系统用户' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'operationList',
@@ -171,6 +283,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "systemMana" */ '../views/systemManagement/operationList.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '8-3');
+                            store.commit('setBreadcrumbList',[
+                                { title:'系统管理' },
+                                { title:'操作记录' },
+                            ]);
+                            next();
+                        }
                     },
                 ]
             },
@@ -184,6 +304,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "systemMana" */ '../views/operationManagement/list.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '9-1');
+                            store.commit('setBreadcrumbList',[
+                                { title:'运营管理' },
+                                { title:'申请预约管理' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'informationList',
@@ -191,6 +319,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "systemMana" */ '../views/operationManagement/information/list.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '9-2');
+                            store.commit('setBreadcrumbList',[
+                                { title:'运营管理' },
+                                { title:'企业版资讯管理' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'advertisementList',
@@ -198,6 +334,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "systemMana" */ '../views/operationManagement/advertisement/list.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '9-3');
+                            store.commit('setBreadcrumbList',[
+                                { title:'运营管理' },
+                                { title:'广告管理' },
+                            ]);
+                            next();
+                        }
                     },
                     {
                         path: 'startScreenList',
@@ -205,6 +349,14 @@ const routes = [
                         component: function () {
                             return import(/* webpackChunkName: "systemMana" */ '../views/operationManagement/startScreen/list.vue')
                         },
+                        beforeEnter: (to, from, next) => {
+                            store.commit('changeMenuActiveIndex', '9-4');
+                            store.commit('setBreadcrumbList',[
+                                { title:'运营管理' },
+                                { title:'广告页管理' },
+                            ]);
+                            next();
+                        }
                     },
                 ]
             },

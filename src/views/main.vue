@@ -323,16 +323,6 @@ export default {
             'getAuthPageData'
         ])
     },
-    watch:{
-        "$route":function(nval,val){
-            if( nval.path == '/main' ){
-                this.$store.commit('setBreadcrumbList',[
-                    { title:'首页' }
-                ]);
-                this.$store.commit('changeMenuActiveIndex', '0')
-            }
-        }
-    },
     mounted(){
         this.setTitleInfo();
         this.reGenerateNavMenu();

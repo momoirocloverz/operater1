@@ -30,23 +30,23 @@
                     <template v-slot="scope">{{ scope.row.mobile || '无' }}</template>
                 </el-table-column>
                 <el-table-column prop="type" label="商家类型" width="120" :formatter="accountTypeFormatter" ></el-table-column>
-                   <el-table-column label="公司简称">
-                       <template v-slot="scope">{{ scope.row.shortName || '无' }}</template>
-                    </el-table-column>
-                   <el-table-column label="公司全称" show-overflow-tooltip width="220">
-                       <template v-slot="scope">{{ scope.row.name || '无' }}</template>
-                    </el-table-column>
-                   <el-table-column label="行业" show-overflow-tooltip>
-                       <template v-slot="scope">{{ scope.row.industryName || '无' }}</template>
-                    </el-table-column>
-                   <el-table-column prop="realName"  label="联系人姓名" show-overflow-tooltip></el-table-column>
-                   <el-table-column prop="idCard"  label="身份证号" show-overflow-tooltip></el-table-column>
-                   <el-table-column prop="status" :formatter="accountStatusFormatter" label="账号状态" show-overflow-tooltip></el-table-column>
-                   <el-table-column label="操作" v-if="AuthBoolean('61')">
-                       <template v-slot="scope">
-                           <el-button size="mini" v-Auth="'61'" type="text" @click="checkDetail(scope.row)">详情</el-button>                           
-                        </template>
-                    </el-table-column>
+                <el-table-column label="公司简称">
+                    <template v-slot="scope">{{ scope.row.shortName || '无' }}</template>
+                </el-table-column>
+                <el-table-column label="公司全称" show-overflow-tooltip width="220">
+                    <template v-slot="scope">{{ scope.row.name || '无' }}</template>
+                </el-table-column>
+                <el-table-column label="行业" show-overflow-tooltip>
+                    <template v-slot="scope">{{ scope.row.industryName || '无' }}</template>
+                </el-table-column>
+                <el-table-column prop="realName"  label="联系人姓名" show-overflow-tooltip></el-table-column>
+                <el-table-column prop="idCard"  label="身份证号" show-overflow-tooltip></el-table-column>
+                <el-table-column prop="status" :formatter="accountStatusFormatter" label="账号状态" show-overflow-tooltip></el-table-column>
+                <el-table-column label="操作" v-if="AuthBoolean('61')" >
+                    <template v-slot="scope">
+                        <el-button size="mini" v-Auth="'61'" type="text" @click="checkDetail(scope.row)" v-if="scope.row.status !=3">详情</el-button>                           
+                    </template>
+                </el-table-column>
               </el-table>
         </div>
           <div class="pagCon" v-if="total">
@@ -249,6 +249,7 @@ export default {
                 { label:'不限',value:0 },
                 { label:'可用',value:1 },
                 { label:'冻结',value:2 },
+                { label:'升级为企业',value:3 },
             ],
             options3:[
                 { label:'你好',value:1 },
@@ -272,6 +273,9 @@ export default {
                         break;
                     case 2:
                         return '冻结';
+                        break; 
+                    case 3:
+                        return '升级为企业';
                         break;    
                 }
             }else{
