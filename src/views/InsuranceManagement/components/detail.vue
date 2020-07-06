@@ -55,21 +55,25 @@
             <div class="tableCon">
                 <el-table :data="tableData" stripe style="width: 100%">
                     <el-table-column prop="createdAt" label="投保时间" width="170"></el-table-column>
-                    <el-table-column prop="talentName" label="被保人" width="100"></el-table-column>
+                    <el-table-column prop="talentName" label="被保人" width="130"></el-table-column>
                     <el-table-column prop="mobile" label="联系电话" width="120" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="customerName" label="投保方" width="100" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="insuCompany" label="投保公司" width="100" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="insuName" label="保险名称" width="100" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="policyNo" label="保单号" width="" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="" label="保障时间" width="200" show-overflow-tooltip>
+                    <el-table-column prop="policyNo" label="保单号" width="" show-overflow-tooltip>
                         <template v-slot="scope">
-                            <div>{{scope.row.insuStartAt.substring(0,16)}}至</div>
-                            <div>{{scope.row.insuEndAt.substring(0,16)}}</div>
+                            <div v-if="scope.row.policyNo">{{ scope.row.policyNo }}</div>
+                            <div v-else>-</div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column  label="保障时间" show-overflow-tooltip>
+                        <template v-slot="scope">
+                            <div>{{scope.row.insuStartAt.substring(0,16)}}至{{scope.row.insuEndAt.substring(0,16)}}</div>
                         </template>
                     </el-table-column>
                     <el-table-column prop="insuFee" label="成本" :formatter="forCost" width="100" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="sellingPrice" label="收费" :formatter="forCost" width="100" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="successTime" label="成功时间" :formatter="isContent" width="160" show-overflow-tooltip></el-table-column>
+                    <el-table-column label="成功时间" :formatter="isContent" width="160" show-overflow-tooltip></el-table-column>
                 </el-table>
             </div>
             <div class="pagCon">
@@ -146,11 +150,11 @@
                     return '无'
                 }
             },
-            isContent(cell,col,val){
-                if(val){
-                    return val
+            isContent(row,col){
+                if( row.successTime ){
+                    return row.successTime
                 }else{
-                    return '无'
+                    return '-'
                 }
             },
             async getInsuType(){

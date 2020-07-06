@@ -54,7 +54,7 @@
                     </el-table-column>
                     <el-table-column prop="name" label="广告名称" width="" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="device" label="上架端口" :formatter="forDevice" width="" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="location" label="广告位置" width="" :formatter="forLocation"></el-table-column>
+                    <el-table-column  label="广告位置" width="" :formatter="forLocation"></el-table-column>
                     <el-table-column label="显示对象" width="" :formatter="forDisplayObj"></el-table-column>
                     <el-table-column prop="jumpWay" label="跳转方式" width="" :formatter="forJumpWay"></el-table-column>
                     <el-table-column prop="" label="跳转地址" width="200">
@@ -113,8 +113,9 @@
                 </el-form-item>
                 <el-form-item prop="position" label="广告位置" label-width="200px">
                     <el-select v-model="inforForm.position" size="small" placeholder="选择广告位置">
-                        <el-option label="个人版工作台banner" :value="1"></el-option>
-                        <el-option label="pc端首页轮播" :value="2"></el-option>
+                        <el-option label="首页轮播" :value="2"></el-option>
+                        <el-option label="管理页轮播" :value="1"></el-option>
+                        <el-option label="个人中心轮播" :value="3"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item prop="jump" label="跳转方式" label-width="200px">
@@ -497,13 +498,21 @@
                     default:
                         return '-'
                 }
-            },forLocation(row,col,val){
-                if(Number(val) === 1){
-                    return 'banner'
-                }else if(Number(val) === 2){
-                    return 'pc端首页轮播'
-                }else{
-                    return ''
+            },
+            forLocation(row,col){
+                switch( +row.location ){
+                    case 3:
+                        return '个人中心轮播';
+                        break;
+                    case 2:
+                        return '首页轮播';
+                        break;
+                    case 1:
+                        return '管理页轮播';
+                        break;    
+                    default:
+                        return '-';
+                        break;
                 }
             },
             forJumpWay(row,col,val){
@@ -582,28 +591,23 @@
                 width: 200px;
                 margin-right: 10px;
             }
-
             .topFirst {
                 display: flex;
                 justify-content: space-between;
                 align-content: center;
                 align-items: center;
             }
-
             .topSec {
                 margin-top: 15px;
             }
         }
-
         .bottomCon {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-
             .tableCon {
                 margin-top: 10px;
             }
-
             .pagCon {
                 display: flex;
                 justify-content: center;

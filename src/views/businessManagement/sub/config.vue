@@ -8,11 +8,12 @@
                     <span class="radioTitle">三方结算功能：</span>
                     <span>{{thirdConfirmText}}</span>
                 </div>
-                <div class=" setMargina" v-show="thirdConfirmText == '启用' ">
+                <el-button type="primary" size="small" v-Auth="'65'" @click="popEditAuth" style="margin-right: 6.25rem;">编辑</el-button>
+                <div class=" setMargina">
                     <span class="radioTitle">特殊考勤功能：</span>
                     <span>{{emptyTalentText}}</span>
                 </div>
-                <el-button type="primary" size="small" v-Auth="'65'" @click="popEditAuth">编辑</el-button>
+                <el-button type="primary" size="small" v-Auth="'65'" @click="popSpecial">编辑</el-button>
             </div>
             <div class="secondSelectCon">
                 <div  class="radioTitle">打卡管理功能：</div>
@@ -136,16 +137,11 @@
         <el-dialog title="功能权限 设置" class="setAuthScoped setMiddleDialog" :visible.sync="authVisible" width="450px" :close-on-click-modal="false" center>
             <div>
                 <el-form :model="authForm" status-icon ref="authForm"
-                         label-width="120px" class="demo-ruleForm " >
+                         label-width="120px" class="demo-ruleForm " 
+                         label-position="left">
                     <div class="setAuthInnerHeight">
                     <el-form-item label="三方结算功能" >
                         <el-radio-group v-model.trim="authForm.radio2" >
-                            <el-radio :label="3">启用</el-radio>
-                            <el-radio :label="6">不启用</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                        <el-form-item label="特殊考勤功能" v-show="authForm.radio2 == 3">
-                        <el-radio-group v-model.trim="authForm.radio1">
                             <el-radio :label="3">启用</el-radio>
                             <el-radio :label="6">不启用</el-radio>
                         </el-radio-group>
@@ -162,6 +158,32 @@
                 </el-form>
             </div>
         </el-dialog>
+        <!--  -->
+        <el-dialog title="特殊考勤功能 设置" class="setAuthScoped setMiddleDialog" :visible.sync="authSpecialvisible" width="450px" :close-on-click-modal="false" center>
+            <div>
+                <el-form :model="authForm" status-icon ref="authForm"
+                         label-width="120px" class="demo-ruleForm " 
+                         label-position="left">
+                    <div class="setAuthInnerHeight">
+                    <el-form-item label="特殊考勤功能" >
+                      <el-radio-group v-model.trim="authForm.radio1">
+                          <el-radio :label="3">启用</el-radio>
+                          <el-radio :label="6">不启用</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                        </div>
+                    <div class="flexHere">
+                        <el-button type="primary" size="small" class="sameWidthBtn"
+                                   @click="specialsubmitAuthPass('authForm')">确 定
+                        </el-button>
+                        <el-button type="info" size="small" class="sameWidthBtn"
+                                   @click="cancelAuthPass('authForm')">取 消
+                        </el-button>
+                    </div>
+                </el-form>
+            </div>
+        </el-dialog>        
+
         <el-dialog title="付款手续费 设置" class="setRootScoped setMiddleDialog" :visible.sync="commissionVisible" width="450px" :close-on-click-modal="false" center>
             <div>
                 <el-form :model="commissionForm" status-icon :rules="commissionRules" ref="commissionForm"
@@ -556,6 +578,7 @@
                 emptyTalentText:'不启用',
                 thirdConfirmText:'不启用',
                 authVisible:false,
+                authSpecialvisible:false,
                 authForm:{
                     radio1: 6,
                     radio2: 6, 
@@ -1087,9 +1110,11 @@
             submitAuthPass(formName){
                 let data = {
                     cusId:this.$route.query.id,
-                    emptyTalentSwitch: this.authForm.radio2 == 6 ? 0 :this.authForm.radio1%2,
+                    emptyTalentSwitch: this.authForm.radio1 == 6 ? 0 : 1,
                     thirdConfirmSwitch:this.authForm.radio2 == 6 ? 0 : 1,
-                };                
+                };           
+                // console.log(' 特殊考勤:' + data.emptyTalentSwitch)  
+                // console.log(' 第三方结算:' + data.thirdConfirmSwitch) 
                 this.ApiLists.businessCustomerSetting(data).then(res=>{
                     let { respCode } = res;
                     if( respCode === 0 ){
@@ -1106,8 +1131,34 @@
                     console.log('err',err);
                 })
             },
+            specialsubmitAuthPass(formName){
+              let data = {
+                  cusId:this.$route.query.id,
+                  emptyTalentSwitch: this.authForm.radio1 == 6 ? 0 : 1,
+                  thirdConfirmSwitch:this.authForm.radio2 == 6 ? 0 : 1,
+              };    
+              // console.log(' 特殊考勤:' + data.emptyTalentSwitch)  
+              // console.log(' 第三方结算:' + data.thirdConfirmSwitch) 
+              this.ApiLists.businessCustomerSetting(data).then(res=>{
+                  let { respCode } = res;
+                  if( respCode === 0 ){
+                      this.$message({
+                          message: '设置成功',
+                          type: 'success'
+                      });
+                      this.authSpecialvisible = false;
+                      this.checkOwnAttribute();
+                      this.fetchParent(); 
+                  }else{
+                     console.log(this.authSpecialvisible)
+                  }
+              }).catch(err=>{
+                  console.log('err',err);
+              })
+            },
             cancelAuthPass(formName){
                 this.authVisible = false;
+                this.authSpecialvisible = false;
             },
             setPopSp(scope){
                 this.insuranceInverseVisible = true;
@@ -1397,7 +1448,10 @@
                 });
             },
             popEditAuth(){
-                this.authVisible = true;
+              this.authVisible = true;
+            },
+            popSpecial(){
+              this.authSpecialvisible = true
             },
             getConfigInfo(){
                 let params = {
@@ -1671,8 +1725,13 @@
             width: 200px;
             margin-right: 10px;
         }
+        .demo-ruleForm{
+          display: flex;
+          flex-direction: column;
+          align-items: center
+        }
         .setAuthInnerHeight {
-            height: 140px;
+            padding: 2.5rem /* 40/16 */ 0;
         }
         .checkItemCon {
             padding-left: 100px;
