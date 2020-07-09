@@ -113,6 +113,9 @@
           <div v-if="activeName == 'ninth' ">
               <Function/>
           </div>
+          <div v-if="activeName=='tenth'">
+                <Online/>
+            </div>
       </div>
       <el-dialog
         title="提示"
@@ -274,18 +277,19 @@
   </div>
 </template>
 <script>
-import Role from './components/role'
-import CropInfo from './sub/cropInfo.vue'
-import Config from './sub/config.vue'
-import Account from './sub/account.vue'
-import Attr from './components/attribute'
-import SkillTag from './components/skillTag'
-import Function from './sub/function.vue'
-import Record from './components/record';
+    import Role from './components/role'
+    import CropInfo from './sub/cropInfo.vue'
+    import Config from './sub/config.vue'
+    import Account from './sub/account.vue'
+    import Attr from './components/attribute'
+    import SkillTag from './components/skillTag'
+    import Function from './sub/function.vue'
+    import Record from './components/record';
+    import Online from './components/online'
 
 export default {
   name: 'businessDetail',
-  components: { Role, Attr, CropInfo, Account, SkillTag, Config,Function,Record },
+  components: { Role, Attr, CropInfo, Account, SkillTag, Config,Function,Online },
   data() {
     var validatePass = (rule, value, callback) => {
       if( !this.companyForm.province  ||  !this.companyForm.region || !this.companyForm.city){
@@ -817,12 +821,18 @@ export default {
               name: 'fifth',
             })
           }
-              if( this.AuthBoolean('3701') ){
-                  empty2.push({
-                      title: '功能配置',
-                      name: 'ninth'
-                  })
-              }
+            if( this.AuthBoolean('3701') ){
+                empty2.push({
+                    title: '功能配置',
+                    name: 'ninth'
+                })
+            }
+            if( this.AuthBoolean('38') ){
+                empty2.push({
+                    title: '线上发放配置',
+                    name: 'tenth'
+                })
+            }
           this.restTabArr = empty2
           // this.restTabArr = [
           //     {title: '服务配置', name: 'second'},

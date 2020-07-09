@@ -8,15 +8,6 @@
                         <CusTable :tableData="tableData1" @bindEvent="freezePersonal" :key="1"></CusTable>
                     </div>
                 </div>
-                <div class="picControl">
-                    <div class="itemTitle">打卡照片</div>
-                    <div class="imgArea">
-                        <div>
-                            <img :src="info.bestFrame">
-                        </div>
-                        <div class="btnCon"><el-button type="primary" size="small" v-Auth="'6211'" @click="popEdit">替换</el-button></div>
-                    </div>
-                </div>
             </div>
             <div class="divideItem">
                 <div class="itemTitle">基本信息</div>
@@ -24,6 +15,48 @@
                     <div class="">
                         <CusTable :tableData="tableData2" @bindEvent="resetPwdFunc" :key="3"></CusTable>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="cardInfo">
+            <div class="itemTitle">银行卡信息</div>
+            <el-table
+                border
+                header-cell-class-name="cellStyle"
+                :data="tableData3"
+                style="width: 100%;">
+                <el-table-column
+                    prop="bankName"
+                    label="开户行"
+                    width="210">
+                </el-table-column>
+                <el-table-column
+                    prop="cardNumber"
+                    label="卡号"
+                    width="210">
+                </el-table-column>
+                <el-table-column
+                    prop="createdAt"
+                    label="绑定时间">
+                </el-table-column>
+                <el-table-column
+                    prop="unbindDate"
+                    label="解绑时间">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.unbindDate}}</span>
+                        <a href="javascript:;" @click="openBox(scope.row)" class="clearEnd">清除解绑记录</a>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <div class="divideItem">
+            <div class="picControl">
+                <div class="itemTitle">打卡照片</div>
+                <div class="imgArea">
+                    <div>
+                        <img :src="info.bestFrame">
+                    </div>
+                    <div class="btnCon"><el-button type="primary" size="small" v-Auth="'6211'" @click="popEdit">替换</el-button></div>
                 </div>
             </div>
         </div>
@@ -55,6 +88,7 @@
             return {
                 tableData1: [],
                 tableData2: [],
+                tableData3:[],
                 info:{},
                 request:false,
                 upVisible:false,
@@ -67,8 +101,66 @@
         mounted() {
             this.getInfo()
             this.getToken();
+            this.bankList()
         },
         methods: {
+            //银行卡列表
+            bankList(){
+                let params = {
+                    userId:this.userId
+                }
+                this.ApiLists.getByUserId(params).then(res=>{
+                    console.log(res)
+                    if(res.respCode == 0){
+                        if(res.data){
+                            this.tableData3=res.data
+                        }else{
+                            this.tableData3 = []
+                        }
+                    }
+                }).catch(err =>{
+
+                }).finally(() => {
+
+                })
+            },
+
+            //清除解绑记录
+            clearRecord(bankId){
+                let params = {
+                    bankId:bankId
+                }
+                this.ApiLists.clearRecord(params).then(res=>{
+                    if(res.respCode == 0){
+                        this.bankList()
+                        this.$message({
+                            type: 'success',
+                            message: '解绑成功!'
+                        });
+                    }
+                }).catch(err =>{
+
+                }).finally(() => {
+
+                })
+            },
+            //打开清除解绑的弹框
+            openBox(val){
+                this.$confirm('确认清除用户的银行卡解绑记录?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    cancelButtonClass:'el-button--info',
+                    closeOnClickModal:false,
+                    type: 'warning'
+                }).then(() => {
+                    this.clearRecord(val.id)
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消解绑'
+                    });          
+                });
+            },
             uploadAction(){
                 if( this.imageUrl1 ){
                     this.updateBestFrameAction();
@@ -286,6 +378,24 @@
     }
 </script>
 <style lang="scss" scoped>
+    .clearEnd{
+        margin-left:10px;
+        text-decoration:none;
+    }
+    /deep/.cellStyle{
+        background: #F0F2F5;
+    }
+    /deep/.el-table .el-table__header .cell{
+        color: #606266;
+        font-size: 12px;
+        font-weight: normal;
+        padding-left:20px;
+    }
+    /deep/.el-table .el-table__body .cell{
+        color: #606266;
+        font-size: 12px;
+        padding-left:20px;
+    }
     .detailUserList {
         .itemTitle {
             color: #606266;
@@ -296,6 +406,9 @@
         }
         .divideItem {
             width: 49%;
+        }
+        .cardInfo{
+             width:100%;
         }
         .flexHere {
             text-align: center;

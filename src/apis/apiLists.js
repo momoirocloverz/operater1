@@ -897,6 +897,24 @@ const _apiLists = {
             params,
         })
     },
+
+    //银行卡列表
+    getByUserId: (params) => {
+        return instance({
+            method: 'get',
+            url: '/trade/accountBank/getByUserId',
+            params,
+        })
+    },
+
+    //清除解绑记录
+    clearRecord: (params) => {
+        return instance({
+            method: 'get',
+            url: '/trade/accountBank/clearRecord',
+            params,
+        })
+    },
     //  个人商家升级为企业商家
     personaLupgrade: (data) => {
       return instance({

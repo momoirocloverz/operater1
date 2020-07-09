@@ -320,10 +320,10 @@
         methods: {
             formatterNoteInfo(row,column){
                 if( row.category ){
-                    if(  row.category == 4  ){
+                    if(  row.category != 1  ){
                         return row.note;
                     }else{
-                       return row.note + this.Dayjs(row.feeDate).format('-MM-DD');
+                       return row.note + '-' +row.attributeName + this.Dayjs(row.feeDate).format('-MM-DD');
                     }
                 }else{
                     return '-';
